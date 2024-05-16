@@ -401,6 +401,20 @@ export function AsideMenuList({ layoutProps }) {
             <span className="menu-text">System Maintenance</span>
           </NavLink>
         </li>
+
+        <li
+          className={`menu-item ${getMenuItemActive("/feed")}`}
+          aria-haspopup="true"
+        >
+          <NavLink className="menu-link menu-toggle" to="/feed">
+            <span className="svg-icon menu-icon">
+              <SVG
+                src={toAbsoluteUrl("/media/svg/icons/General/Feed.svg")}
+              />
+            </span>
+            <span className="menu-text">Admin feed</span>
+          </NavLink>
+        </li>
       </ul>
     </>
   );
