@@ -5,44 +5,51 @@ import SVG from "react-inlinesvg";
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import { FaWhatsapp, FaEnvelope } from 'react-icons/fa';
-import { FaTelegram, FaInstagram, FaFacebook } from 'react-icons/fa';
+import { FaWhatsapp, FaEnvelope, FaTelegram, FaInstagram, FaFacebook } from 'react-icons/fa';
+import { useAuth } from './AuthContext'; // Adjust the path accordingly
+import "../ModelDetails/FeedCard.css";
 
-import { showErrorToast } from '../../../Utility/toastMsg';
-
-
-
-const CardHeader = ({ author }) => (
-    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-        <div style={{ marginRight: '10px' }}>
-            <img src={toAbsoluteUrl("/media/users/300_21.jpg")} alt="Avatar" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+const CardHeader = ({ author, postAge }) => (
+    <div className="card-header-custom">
+        <div className="header-left">
+            <img src={toAbsoluteUrl("/media/users/300_21.jpg")} alt="Avatar" className="avatar" />
+            <h6>{author}</h6>
         </div>
         <div>
-            <h6>{author}</h6>
+            <small>{postAge}</small>
         </div>
     </div>
 );
 
 function FeedCard() {
-    const [postData, setPostData] = useState([]);
     const [showCommentModal, setShowCommentModal] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
     const [commentText, setCommentText] = useState('');
     const [commentImage, setCommentImage] = useState(null);
     const [likedPosts, setLikedPosts] = useState([]);
     const [showShareModal, setShowShareModal] = useState(false);
-
+    const { postData, fetchFeeds, handleDeletePost, handleUpload } = useAuth();
     useEffect(() => {
-        fetch("http://192.168.1.9:8083/feeds")
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-                setPostData(data);
-            })
-            .catch((error) => showErrorToast.error("Error fetching data:", error));
-    }, []);
+        fetchFeeds();
+    }, [fetchFeeds, handleUpload]);
 
-
+    const calculatePostAge = (createdAt) => {
+        const postDate = new Date(createdAt);
+        const currentDate = new Date();
+        const timeDifference = currentDate - postDate;
+        const minutesDifference = Math.floor(timeDifference / (1000 * 60));
+        const hoursDifference = Math.floor(timeDifference / (1000 * 60 * 60));
+        const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+        if (minutesDifference < 1) {
+            return "just now";
+        } else if (daysDifference > 0) {
+            return `${daysDifference} day${daysDifference > 1 ? 's' : ''} ago`;
+        } else if (hoursDifference > 0) {
+            return `${hoursDifference} hour${hoursDifference > 1 ? 's' : ''} ago`;
+        } else {
+            return `${minutesDifference} minute${minutesDifference > 1 ? 's' : ''} ago`;
+        }
+    };
 
     const handleShareClick = (post) => {
         setSelectedPost(post);
@@ -66,7 +73,6 @@ function FeedCard() {
         window.location.href = url;
     };
 
-
     const handleShareTelegram = (post) => {
         const message = encodeURIComponent(`Check out this post: ${post.link}`);
         const url = `https://telegram.me/share/url?url=${message}`;
@@ -74,28 +80,16 @@ function FeedCard() {
     };
 
     const handleCommentSubmit = () => {
-
         console.log('Comment text:', commentText);
         console.log('Comment image:', commentImage);
-
         setShowCommentModal(false);
     };
-    const handleDeletePost = (postId) => {
-        console.log("button clicked");
-        fetch(`http://192.168.1.9:8083/feeds/id/${postId}`, {
-            method: "DELETE",
-        })
-            .then(() => {
-                setPostData((prevPosts) =>
-                    prevPosts.filter((post) => post.id !== postId)
-                );
-            })
-            .catch((error) => console.error("Error deleting post:", error));
-    };
+
     const handleCommentClick = (post) => {
         setSelectedPost(post);
         setShowCommentModal(true);
     };
+
     const handleLikeClick = (postId) => {
         if (likedPosts.includes(postId)) {
             setLikedPosts(likedPosts.filter((id) => id !== postId));
@@ -103,33 +97,27 @@ function FeedCard() {
             setLikedPosts([...likedPosts, postId]);
         }
     };
+
     const handleShareGmail = (post) => {
         const subject = 'Check out this post';
         const body = `Hi,\n\nI thought you might be interested in this post: ${post.link}`;
         const url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         window.location.href = url;
     };
+
     return (
-        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        <div className="feed-card-container">
             {postData.map((post) => (
-                <Card key={post.id} style={{ maxWidth: '345px', margin: '10px' }}>
+                <Card key={post.id} className="feed-card">
                     <Card.Header>
-                        <CardHeader author={post.author} />
+                        <CardHeader author={post.author} postAge={calculatePostAge(post.createdAt)} />
                     </Card.Header>
-                    <Card.Img
-                        style={{ width: "100%", height: "300px" }}
-                        variant="top"
-                        src={post.link}
-                        alt="green iguana"
-                    />
+                    <Card.Img className="post-img" variant="top" src={post.link} alt="Post" />
                     <Card.Body>
-                        <Card.Text>
-                            {post.description}
-                        </Card.Text>
+                        <Card.Text>{post.description}</Card.Text>
                     </Card.Body>
-                    <Card.Footer style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Card.Footer className="card-footer-custom">
                         <div>
-                            {/* Like button */}
                             <button
                                 title="Like"
                                 className="btn btn-icon btn-light btn-hover-danger btn-sm mr-2"
@@ -139,13 +127,11 @@ function FeedCard() {
                                     <SVG src={toAbsoluteUrl(likedPosts.includes(post.id) ? "/media/svg/icons/General/Heart.svg" : "/media/svg/icons/General/Heart.svg")} />
                                 </span>
                             </button>
-                            {/* Comment button */}
-                            <a href="#" title="Comment" className="btn btn-icon btn-light btn-hover-danger btn-sm mr-2 " onClick={() => handleCommentClick(post)}>
+                            <a href="#" title="Comment" className="btn btn-icon btn-light btn-hover-danger btn-sm mr-2" onClick={() => handleCommentClick(post)}>
                                 <span className="svg-icon svg-icon-md svg-icon-warning">
                                     <SVG src={toAbsoluteUrl("/media/svg/icons/General/comment.svg")} />
                                 </span>
                             </a>
-                            {/* Share button */}
                             <a href="#" title="Share" className="btn btn-icon btn-light btn-hover-danger btn-sm mr-2" onClick={() => handleShareClick(post)}>
                                 <span className="svg-icon svg-icon-md svg-icon-warning">
                                     <SVG src={toAbsoluteUrl("/media/svg/icons/General/share.svg")} />
@@ -153,7 +139,6 @@ function FeedCard() {
                             </a>
                         </div>
                         <div>
-                            {/* Delete Post button */}
                             <a href="#" title="Delete Post" className="btn btn-icon btn-light btn-hover-danger btn-sm mr-2" onClick={() => handleDeletePost(post.id)} >
                                 <span className="svg-icon svg-icon-md svg-icon-danger">
                                     <SVG src={toAbsoluteUrl("/media/svg/icons/General/Trash.svg")} />
@@ -161,11 +146,9 @@ function FeedCard() {
                             </a>
                         </div>
                     </Card.Footer>
-
                 </Card>
             ))}
 
-            {/* Comment Modal */}
             {selectedPost && (
                 <Modal show={showCommentModal} onHide={() => setShowCommentModal(false)} centered>
                     <Modal.Header closeButton>
@@ -173,9 +156,8 @@ function FeedCard() {
                     </Modal.Header>
                     <Modal.Body>
                         <Form>
-                            {/* Comment input field */}
                             <Form.Group controlId="commentText">
-                                <Form.Label>Type Your Comment </Form.Label>
+                                <Form.Label>Type Your Comment</Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     rows={3}
@@ -196,11 +178,9 @@ function FeedCard() {
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
-                        {/* Close modal button */}
                         <Button variant="secondary" onClick={() => setShowCommentModal(false)}>
                             Close
                         </Button>
-                        {/* Submit comment button */}
                         <Button variant="primary" onClick={handleCommentSubmit}>
                             Submit
                         </Button>
@@ -211,28 +191,26 @@ function FeedCard() {
             <Modal show={showShareModal} onHide={() => setShowShareModal(false)} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Share Post</Modal.Title>
+                    <div style={{ marginLeft: 'auto' }}>
+                        <Button variant="danger" onClick={() => setShowShareModal(false)}>
+                            Close
+                        </Button>
+                    </div>
                 </Modal.Header>
                 <Modal.Body>
-                    <div style={{
-                        display: "flex", justifyContent: "space-between"
-                    }}>
-                        {/* WhatsApp icon */}
+                    <div className="share-buttons-container">
                         <Button variant="light" onClick={() => handleShareWhatsApp(selectedPost)}>
                             <FaWhatsapp size={20} color="#128C7E" />
                         </Button>
-                        {/* Gmail icon */}
                         <Button variant="light" onClick={() => handleShareGmail(selectedPost)}>
                             <FaEnvelope size={20} color="#EA4335" />
                         </Button>
-                        {/* Telegram icon */}
                         <Button variant="light" onClick={() => handleShareTelegram(selectedPost)}>
                             <FaTelegram size={20} color="#0088cc" />
                         </Button>
-                        {/* Instagram icon */}
                         <Button variant="light" onClick={() => handleShareInstagram(selectedPost)}>
                             <FaInstagram size={20} color="#bc2a8d" />
                         </Button>
-
                         <Button variant="light" onClick={() => handleShareFacebook(selectedPost)}>
                             <FaFacebook size={20} color="#3b5998" />
                         </Button>
