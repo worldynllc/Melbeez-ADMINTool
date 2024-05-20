@@ -823,3 +823,4 @@ export function updateApprovedProduct(payload, ID) {
   };
   return fetch(`${process.env.REACT_APP_API_URL}/api/productModelInformation/${ID}`, reqoption);
 }
+
