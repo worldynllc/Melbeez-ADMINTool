@@ -196,7 +196,7 @@ export default function ProductFeed({
                   handleChange(e); // Only update the state if input is valid
                 }}
                 placeholder="Enter a description (max 200 characters)"
-                isInvalid={!!descriptionError} // Show invalid styling when there's an error
+                isInvalid={!!descriptionError} 
               />
               <Form.Control.Feedback type="invalid">
                 {descriptionError}
