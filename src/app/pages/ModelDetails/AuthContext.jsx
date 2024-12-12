@@ -17,33 +17,33 @@ export const AuthProvider = ({ children }) => {
   const [postcomments, setPostcomments] = useState([]);
   const [likedetails, setLikeDetails] = useState([]);
   
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const response = await authUserDetail();
-        if (!response.ok) {
-          throw new Error("Failed to fetch user details");
-        }
-        const data = await response.json();
-        // console.log(data)
-        localStorage.setItem("userName", data.result.username)
-        localStorage.setItem("userId", data.result.id)
-        localStorage.setItem("firstName", data.result.firstName)
-        localStorage.setItem("lastName", data.result.lastName)
+  // useEffect(() => {
+  //   const fetchUserDetails = async () => {
+  //     try {
+  //       const response = await authUserDetail();
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch user details");
+  //       }
+  //       const data = await response.json();
+  //       // console.log(data)
+  //       // localStorage.setItem("userName", data.result.username)
+  //       // localStorage.setItem("userId", data.result.id)
+  //       // localStorage.setItem("firstName", data.result.firstName)
+  //       // localStorage.setItem("lastName", data.result.lastName)
     
-        setUserDetails(data);
-      } catch (error) {
-        setError(error.message);
-      } //finally {
-      //   setLoading(false);
-      // }
-    };
-    fetchUserDetails();
-  }, []);
+  //       setUserDetails(data);
+  //     } catch (error) {
+  //       setError("from auth",error.message);
+  //     } //finally {
+  //     //   setLoading(false);
+  //     // }
+  //   };
+  //   fetchUserDetails();
+  // }, []);
   const fetchFeeds = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_JAVA_API_URL}/all/feeds`, {mode: 'cors'}
+        `${process.env.REACT_APP_JAVA_API_URL}/all/feeds`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch feeds");
@@ -72,6 +72,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
   const handleUpload = async (formData, setMessage, setFormData, setShow) => {
+    const userId = localStorage.getItem("userId")
+  
     if (!formData.author) {
       setMessage("Author is required.");
       showWarnToast("Please fill in all required fields.");
@@ -91,8 +93,8 @@ export const AuthProvider = ({ children }) => {
     if (formData.description) {
       form.append("description", formData.description);
     }
-    if (userDetails) {
-      form.append("userId", userDetails.result.id);
+    if (userId) {
+      form.append("userId", userId);
     }
     try {
       const response = await fetch(
@@ -413,7 +415,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
-        userDetails,
+        // userDetails,
         // loading,
         setPostcomments,
         postcomments,

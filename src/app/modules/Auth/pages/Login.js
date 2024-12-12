@@ -66,6 +66,10 @@ function Login(props) {
           localStorage.setItem("authToken", result.result.token);
           localStorage.setItem("refToken", result.result.refreshToken);
           localStorage.setItem("Role", result.result.role);
+          localStorage.setItem("userName", result.result.username)
+          localStorage.setItem("userId", result.result.id)
+          localStorage.setItem("firstName", result.result.firstName)
+          localStorage.setItem("lastName", result.result.lastName)
         } else {
           localStorage.clear();
           setErrorMessage("Please Confirm Your Phone or Email to Login");

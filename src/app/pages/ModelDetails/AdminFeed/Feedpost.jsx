@@ -51,7 +51,7 @@ const FeedPost = ({ post,isLiked,  createLikes ,onplay,  playingVideoId, setPlay
             alt="Video Post"
             style={{
               height: "300px",
-              width: "100%",
+              width: "500px",
               objectFit: "contain",
               background: "#1A1A27",
             }}
@@ -75,11 +75,11 @@ const FeedPost = ({ post,isLiked,  createLikes ,onplay,  playingVideoId, setPlay
             src={post.link}
             style={{
               height: "300px",
-              width: "100%",
+              width: "500px",
               objectFit: "contain",
               background: "#1A1A27",
             }}
-            alt="Image Post"
+          alt="post"
           />
         )}
         <Card.Body>

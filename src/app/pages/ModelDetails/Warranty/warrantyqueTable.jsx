@@ -170,7 +170,7 @@ const WarrantyProductQueueTable = ({
   const [searchTerms, setSearchTerms] = useState({});
   const [commonSearchTerm, setCommonSearchTerm] = useState("");
   const {
-    userDetails,
+    //userDetails,
   
     handleUploadwarrenty,
     handleUpdateWarranty,
@@ -179,17 +179,20 @@ const WarrantyProductQueueTable = ({
   useEffect(() => {
     fetchData();
   }, []);
-
+  const firstName = localStorage.getItem("firstName")
+  const lastName = localStorage.getItem("lastName")
   useEffect(() => {
-    if (!loading && userDetails && !formData.author) {
-      const fullName = `${userDetails.result.firstName} ${userDetails.result.lastName}`;
+    if (!loading  && !formData.author) {
+      const firstName = localStorage.getItem("firstName")
+      const lastName = localStorage.getItem("lastName")
+      const fullName = `${firstName} ${lastName}`;
       setFormData((prevFormData) => ({
         ...prevFormData,
         created_by: fullName,
         updated_by: fullName,
       }));
     }
-  }, [userDetails, loading, formData.author]);
+  }, [ loading, formData.author]);
 
   const fetchData = async () => {
     setLoading(true); // Set loading to true when data fetch starts
@@ -249,7 +252,7 @@ const WarrantyProductQueueTable = ({
   const handleEdit = (row) => {
     setFormData({
       warrantyId: row.warrantyId,
-      status: row.status,
+      //status: row.status,
       id: row.id,
       vendor: row.vendor,
       name: row.name,
@@ -265,7 +268,7 @@ const WarrantyProductQueueTable = ({
       // terms_conditions: row.terms_conditions,
       // created_by: row.created_by,
       updated_by:
-        userDetails.result.firstName + "" + userDetails.result.lastName,
+        firstName + "" + lastName,
     });
     setShowAddEditModal(true);
   };
