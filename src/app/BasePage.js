@@ -39,37 +39,73 @@ export default function BasePage() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [RoleRoute, setRoleRoute] = useState("");
-  const handleAPIRefresh = () => {
-    setInterval(() => {
-      var obj = {
-        token: localStorage.getItem("authToken"),
-        refreshToken: localStorage.getItem("refToken"),
-      };
-      const reqoption = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "melbeez-platform": "AdminPortal",
-        },
-        body: JSON.stringify(obj),
-      };
-      fetch(
-        `${process.env.REACT_APP_API_URL}/api/user/refresh-token`,
-        reqoption
-      )
-        .then((res) => {
-          return res.json();
-        })
-        .then(() => {
-          localStorage.clear();
-          setShow(true);
-          //handleShow();
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }, 7000000);
+  const handleAPIRefresh  = () => {
+    const refreshInterval =   50 * 60 * 1000; // Refresh every 50 minutes
+  
+    setInterval(async () => {
+      const authToken = localStorage.getItem("authToken");
+      const refreshToken = localStorage.getItem("refToken");
+  
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/user/refresh-token`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "melbeez-platform": "AdminPortal",
+            },
+            body: JSON.stringify({ token: authToken, refreshToken }),
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error("Failed to refresh token");
+        }
+  
+        const data = await response.json();
+        //console.log(data)
+        localStorage.setItem("authToken", data.result.token);
+        localStorage.setItem("refToken", data.result.refreshToken);
+      } catch (error) {
+        //console.error("Token refresh failed:", error);
+        setShow(true);
+      }
+    }, refreshInterval);
   };
+  // const handleAPIRefresh = () => {
+  //   setInterval(() => {
+  //     var obj = {
+  //       token: localStorage.getItem("authToken"),
+  //       refreshToken: localStorage.getItem("refToken"),
+  //     };
+  //     const reqoption = {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "melbeez-platform": "AdminPortal",
+  //       },
+  //       body: JSON.stringify(obj),
+  //     };
+  //     fetch(
+  //       `${process.env.REACT_APP_API_URL}/api/user/refresh-token`,
+  //       reqoption
+  //     )
+  //       .then((res) => {
+  //         return res.json();
+  //       })
+  //       .then(() => {
+  //         localStorage.setItem("authToken");
+  //         localStorage.setItem("refToken");
+  //         //localStorage.clear();
+  //         //setShow(true);
+  //         //handleShow();
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //       });
+  //   }, 10000);
+  // };
   useEffect(() => {
     handleAPIRefresh();
   }, []);

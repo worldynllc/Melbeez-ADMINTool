@@ -36,6 +36,7 @@ function FeedCard() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteType, setDeleteType] = useState(null);
   const [itemToDelete, setItemToDelete] = useState(null);
+  // console.log("SVideoID",playingVideoId);
   useEffect(() => {
     fetchFeeds();
     fetchLikesdetails();
@@ -91,6 +92,7 @@ function FeedCard() {
   const preventLinkDefault = (e) => e.preventDefault();
   const handleVideoPlay = (postId) => {
     // Check if the current video is already playing
+    console.log("postId: " + postId);
     if (playingVideoId !== postId) {
       setPlayingVideoId(postId); // Set the current video as playing
     } else {
