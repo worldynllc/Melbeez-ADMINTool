@@ -1,51 +1,28 @@
 import React, { useState,  useRef } from "react";
-import { Table } from "react-bootstrap";
+import { Table} from "react-bootstrap"; 
 import { TablePagination } from "@material-ui/core";
-import ActionButtonwarranty from "../WarrantyButtonComponent/ActionButtonwarranty";
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
 
-const WarrantyTable = ({
+const  PaymentTable = ({
   columns,
   data,
   currentPage,
   itemsPerPage: initialItemsPerPage,
-  handleEdit,
-  handleDelete,
-  paginate,
-  handlePending,
-  handleRowClick,
-  // handlePendingSubmission
+  paginate, 
 }) => {
   const [itemsPerPage, setItemsPerPage] = useState(initialItemsPerPage);
   const [searchQueries] = useState({});
-  // Sort the data by the 'createdAt' field in descending order (newest first)
-  const sortedData = data.sort(
+  // const [selectedIds, setSelectedIds] = useState([]);
+   useRef(columns.map(() => React.createRef()));
+
+  const sortedData = Array.isArray(data)? data.sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
+  ): "data is not an array"
 
-  const indexOfLastItem = currentPage * itemsPerPage; //1*10
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;//10-10=0 (index)
-  const currentItems = sortedData.slice(indexOfFirstItem, indexOfLastItem);//array.slice(0,10) valuees show in 0 to 9 index values 
 
-  const columnsWithActions = columns.map((column) =>
-    column.dataField === "actions"
-      ? {
-          ...column,
-          formatter: (cell, row) => (
-            <ActionButtonwarranty
-            handlePending={handlePending}
-              row={row}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onView={handleRowClick}
-              // handlePendingSubmission={handlePendingSubmission}
-            />
-          ),
-        }
-      : column
-  );
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedData.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleChangeRowsPerPage = (event) => {
     setItemsPerPage(parseInt(event.target.value, 10));
@@ -55,15 +32,12 @@ const WarrantyTable = ({
   const filteredData = currentItems.filter((item) =>
     columns.every((column) => {
       const query = searchQueries[column.dataField];
-      console.log(query);
       if (query && column.dataField !== "actions") {
         const cellValue = item[column.dataField];
 
-        // Check if the cell value includes the query (case insensitive)
         if (typeof cellValue === "string") {
           return cellValue.toLowerCase().includes(query.toLowerCase());
         } else if (typeof cellValue === "number") {
-          // If cell value is a number, convert to string and check includes
           return cellValue.toString().includes(query);
         }
 
@@ -73,33 +47,33 @@ const WarrantyTable = ({
     })
   );
 
-  // const rowEvents = {
-  //   onClick: (e, row, rowIndex) => {
-  //     handleRowClick(row);
-  //   },
-  // };
+
   return (
     <>
       {filteredData.length === 0 ? (
-        <div className="text-center text-danger mt-4">No data found.</div>
+        <div className="text-center text-danger mt-4">
+          No pending data found!
+        </div>
       ) : (
         <div className="table-responsive">
           <Table
             className="table table-head-custom table-vertical-center overflow-hidden"
             hover
-         condensed="true"
+            condensed="true"
           >
             <thead>
               <tr>
-                {columnsWithActions.map((column, index) => (
+            
+                {columns.map((column, index) => (
                   <th key={index}>{column.text}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filteredData.map((item, index) => (
-                <tr key={index}>
-                  {columnsWithActions.map((column, columnIndex) => (
+                <tr key={item.id}>
+                 
+                  {columns.map((column, columnIndex) => (
                     <td key={columnIndex}>
                       {column.formatter
                         ? column.formatter(item[column.dataField], item)
@@ -113,19 +87,16 @@ const WarrantyTable = ({
         </div>
       )}
       <TablePagination
-        rowsPerPageOptions={[5, 10, 25, 50]} // Options for rows per page
+        rowsPerPageOptions={[5, 10, 25, 50]} 
         component="div"
         count={sortedData.length}
         rowsPerPage={itemsPerPage}
         page={currentPage - 1}
         onChangePage={(e, newPage) => paginate(newPage + 1)}
-        onChangeRowsPerPage={handleChangeRowsPerPage} // Handle change in rows per page
-        // rowEvents={{
-        //   onClick: (e, row) => handleRowClick(row),
-        // }}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
       />
     </>
   );
 };
 
-export default WarrantyTable;
+export default PaymentTable;

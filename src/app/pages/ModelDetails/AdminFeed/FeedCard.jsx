@@ -1,26 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { FixedSizeList as List } from "react-window";
 import { useAuth } from "../AuthContext";
-
 import CommentList from "./CommentList";
-import { Modal } from "react-bootstrap"; // Keep Modal as it is
+import { Modal } from "react-bootstrap"; 
 import DeleteModal from "./DeleteModel";
-// Replace these lines
-import { Form } from "react-bootstrap"; // Corrected import
-import { Button } from "react-bootstrap"; // Corrected import
-
+import { Form } from "react-bootstrap"; 
+import { Button } from "react-bootstrap"; 
 import "./FeedCard.css";
-
 import FeedPost from "./Feedpost";
 import { calculatePostAge } from "../../../../Utility/calculateFeedAge";
+
 function FeedCard() {
   const {
     postData,
-    
     fetchFeeds,
     handleDeletePost,
     fetchComments,
-   
     postcomments,
     createComment,
     createLikes,
@@ -44,8 +39,7 @@ function FeedCard() {
   const handleCommentSubmit = async (e) => {
     e.stopPropagation();
     if (!selectedPost || !commentText.trim()) {
-  
-      return;
+        return;
     }
     try {
       await createComment(selectedPost.id, commentText);
@@ -58,7 +52,6 @@ function FeedCard() {
   };
   const handleCommentClick = async (post) => {
     setSelectedPost(post);
-    
     await fetchComments(post.id);
     await fetchLikesdetails();
     await fetchFeeds();
@@ -90,16 +83,6 @@ function FeedCard() {
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
   const preventLinkDefault = (e) => e.preventDefault();
-  const handleVideoPlay = (postId) => {
-    // Check if the current video is already playing
-    console.log("postId: " + postId);
-    if (playingVideoId !== postId) {
-      setPlayingVideoId(postId); // Set the current video as playing
-    } else {
-      // Don't reset the video if it's already playing
-      setPlayingVideoId(postId); // Ensuring it stays playing when clicked again
-    }
-  };
   const isPostLikedByUser = (postId) => {
     const userId = localStorage.getItem("userId");
     return likedetails.some((like) => like.feed.id === postId && like.userId === userId);
@@ -126,7 +109,6 @@ function FeedCard() {
           fetchComments={fetchComments}
           createLikes={createLikes}
           postcomments={post.comments}
-          onplay={handleVideoPlay}
           playingVideoId={playingVideoId}
           setPlayingVideoId={setPlayingVideoId}
           onDelete={handleDeleteClick}

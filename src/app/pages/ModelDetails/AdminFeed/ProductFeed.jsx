@@ -25,7 +25,7 @@ export default function ProductFeed({
   const [descriptionError, setDescriptionError] = useState("");
   const [fileError, setFileError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { userDetails, handleUpload } = useAuth();
+  const {  handleUpload } = useAuth();
 
   useEffect(() => {
     if (!formData.author) {
@@ -83,7 +83,6 @@ export default function ProductFeed({
       });
     }
   };
-
   const handleChange = (e) => {
     const value = e.target.value;
     if (value.length > 200) {

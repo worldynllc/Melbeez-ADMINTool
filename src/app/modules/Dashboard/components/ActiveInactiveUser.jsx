@@ -18,14 +18,15 @@ export default function ActiveInactive() {
             getDashBoardChart()
                 .then((res) => res.json())
                 .then((res) => {
+                    // console.log(res.result)
                     setActiveUser(res.result.activeUsersCount)
                     setInActiveUser(res.result.inActiveUsersCount)
                 })
                 .then((error) => {
-                    // console.log(error)
+                     //console.log(error)
                 })
                 .catch((error) => {
-                    console.log(error);
+                    //console.log(error);
                     localStorage.clear();
                     handleShow()
                   });

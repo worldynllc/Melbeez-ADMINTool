@@ -29,7 +29,8 @@ import BulkUpload from "./pages/ModelDetails/BulkUpload";
 import Feed from "./pages/ModelDetails/AdminFeed/Feed";
 import Warranty from"./pages/ModelDetails/Warranty/Warranty";
 import WarrantyApproval from "./pages/ModelDetails/Warranty/Warrantypendingapproval";
-import PaymentTable from "./pages/ModelDetails/PaymentTable";
+import PaymentTable from "./pages/ModelDetails/UserPaymentHistory/PaymentTable";
+import userPayments from "./pages/ModelDetails/UserPaymentHistory/userPayments";
 
 const UserProfilepage = lazy(() =>
   import("./modules/UserProfile/UserProfilePage")
@@ -40,7 +41,7 @@ export default function BasePage() {
   const handleShow = () => setShow(true);
   const [RoleRoute, setRoleRoute] = useState("");
   const handleAPIRefresh  = () => {
-    const refreshInterval =   50 * 60 * 1000; // Refresh every 50 minutes
+    const refreshInterval =   30 * 60 * 1000; // Refresh every 30 minutes
   
     setInterval(async () => {
       const authToken = localStorage.getItem("authToken");
@@ -64,7 +65,7 @@ export default function BasePage() {
         }
   
         const data = await response.json();
-        //console.log(data)
+        console.log(data)
         localStorage.setItem("authToken", data.result.token);
         localStorage.setItem("refToken", data.result.refreshToken);
       } catch (error) {
@@ -179,7 +180,7 @@ export default function BasePage() {
           <Route path="/model-details" component={AllData} />
           <Route path="/feed" component={Feed} />
           <Route path="/warranty" component={Warranty} />
-          {/* <Route path="/payment" component={PaymentTable} /> */}
+          <Route path="/payment" component={userPayments} /> 
           <Route path="/approval" component={WarrantyApproval} />
           <Route path="/product-queue" component={ProductQueueTable} />
           <Route

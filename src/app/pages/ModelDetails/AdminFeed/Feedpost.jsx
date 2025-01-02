@@ -4,7 +4,7 @@ import { toAbsoluteUrl } from "../../../../_metronic/_helpers";
 import SVG from "react-inlinesvg";
 
 // import "./FeedCard.css";
-const FeedPost = ({ post,isLiked,  createLikes ,onplay,  playingVideoId, setPlayingVideoId,  handleCommentClick, 
+const FeedPost = ({ post,isLiked,  createLikes ,  playingVideoId, setPlayingVideoId,  handleCommentClick, 
     calculatePostAge,
     handleDeleteClick,
     preventLinkDefault,}) => {
@@ -61,14 +61,6 @@ const FeedPost = ({ post,isLiked,  createLikes ,onplay,  playingVideoId, setPlay
           };
         }, [post.id, playingVideoId, setPlayingVideoId]);
       
-
-// useEffect(() => {
-//   if (playingVideoId === post.id && videoRef.current) {
-//     videoRef.current.play(); // Resume playback if this video is the playing one
-//   }
-// }, [playingVideoId, post.id]);
-
-// }
   return (
     <div key={post.id} >
       <Card className="feed-card">
@@ -102,9 +94,6 @@ const FeedPost = ({ post,isLiked,  createLikes ,onplay,  playingVideoId, setPlay
             background: "#1A1A27",
           }}
           onPlay={() => setPlayingVideoId(post.id)}
-          // onPause={() => {
-          //   if (playingVideoId === post.id) setPlayingVideoId(null);
-          // }}
         />
         ) : (
           <img

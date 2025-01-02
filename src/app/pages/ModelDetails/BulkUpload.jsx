@@ -10,8 +10,7 @@ import { useState } from "react";
 import { showErrorToast, showSuccessToast } from "../../../Utility/toastMsg";
 import { Button } from "react-bootstrap";
 import {
-    headerSortingClasses,
-    toAbsoluteUrl,
+    headerSortingClasses
 } from "../../../_metronic/_helpers";
 import { useHistory } from 'react-router-dom';
 // import TablePagination from "../../Components/TablePagination";

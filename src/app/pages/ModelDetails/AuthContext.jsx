@@ -1,6 +1,5 @@
 // AuthProvider.js
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { authUserDetail } from "../../services/ProfileService";
+import React, { createContext, useContext, useState } from "react";
 import {
   showSuccessToast,
   showErrorToast,
@@ -9,37 +8,11 @@ import {
 const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
-  const [userDetails, setUserDetails] = useState(null);
-  // const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [postData, setPostData] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [postcomments, setPostcomments] = useState([]);
   const [likedetails, setLikeDetails] = useState([]);
   
-  // useEffect(() => {
-  //   const fetchUserDetails = async () => {
-  //     try {
-  //       const response = await authUserDetail();
-  //       if (!response.ok) {
-  //         throw new Error("Failed to fetch user details");
-  //       }
-  //       const data = await response.json();
-  //       // console.log(data)
-  //       // localStorage.setItem("userName", data.result.username)
-  //       // localStorage.setItem("userId", data.result.id)
-  //       // localStorage.setItem("firstName", data.result.firstName)
-  //       // localStorage.setItem("lastName", data.result.lastName)
-    
-  //       setUserDetails(data);
-  //     } catch (error) {
-  //       setError("from auth",error.message);
-  //     } //finally {
-  //     //   setLoading(false);
-  //     // }
-  //   };
-  //   fetchUserDetails();
-  // }, []);
   const fetchFeeds = async () => {
     try {
       const response = await fetch(
@@ -334,7 +307,7 @@ export const AuthProvider = ({ children }) => {
         throw new Error("Failed to upload comment");
       }
 
-      const data = await response.json();
+      await response.json();
       // console.log("Comment uploaded successfully:", data);
       showSuccessToast("Comment added successfully");
     } catch (error) {
@@ -386,6 +359,7 @@ export const AuthProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error("Failed to add Like");
       }
+      console.log("createlike is success")
 
     } catch (error) {
       // console.error("Error uploading Like:", error);
@@ -419,7 +393,7 @@ export const AuthProvider = ({ children }) => {
         // loading,
         setPostcomments,
         postcomments,
-        error,
+        // error,
         handleUpload,
         createComment,
         postData,

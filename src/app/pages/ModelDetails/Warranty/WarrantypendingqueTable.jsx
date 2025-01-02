@@ -137,7 +137,7 @@ const WarrantypendingqueTable = ({
   const [itemsPerPage] = useState(10);
   const [rowData, setRowData] = useState(null);
   const [data, setData] = useState([]);
-  const [showAddEditModal, setShowAddEditModal] = useState(false);
+  //const [showAddEditModal, setShowAddEditModal] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [needsRefresh, setNeedsRefresh] = useState(false);
@@ -187,7 +187,7 @@ const [loading,setLoading]=useState(false)
     }
   };
 
-  const [showAddModel, setShowAddModal] = useState(false);
+  //const [showAddModel, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false); // Modal visibility state
   const [formData, setFormData] = useState({
@@ -213,9 +213,6 @@ const [loading,setLoading]=useState(false)
   const [searchTerms, setSearchTerms] = useState({});
   const [commonSearchTerm, setCommonSearchTerm] = useState("");
   const {
-    userDetails,
-  
-    // handleUploadwarrenty,
     handleUpdateWarranty,
   } = useAuth();
 
@@ -224,15 +221,17 @@ const [loading,setLoading]=useState(false)
   }, []);
 
   useEffect(() => {
-    if (!loading && userDetails && !formData.author) {
-      const fullName = `${userDetails.result.firstName} ${userDetails.result.lastName}`;
+    if (!loading && !formData.author) {
+      const firstName = localStorage.getItem("firstName")
+      const lastName = localStorage.getItem("lastName")
+      const fullName = `${firstName} ${lastName}`;
       setFormData((prevFormData) => ({
         ...prevFormData,
         created_by: fullName,
         updated_by: fullName,
       }));
     }
-  }, [userDetails, loading, formData.author]);
+  }, [ loading, formData.author]);
 
   const fetchData = async () => {
 
@@ -488,6 +487,7 @@ const [loading,setLoading]=useState(false)
               <div>
                 <input
                   type="search"
+                  id="searchInput"
                   className="form-control ml-2"
                   placeholder="Search..."
                   onChange={handleCommonSearchChange}
