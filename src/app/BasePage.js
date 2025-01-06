@@ -29,7 +29,8 @@ import BulkUpload from "./pages/ModelDetails/BulkUpload";
 import Feed from "./pages/ModelDetails/AdminFeed/Feed";
 import Warranty from"./pages/ModelDetails/Warranty/Warranty";
 import WarrantyApproval from "./pages/ModelDetails/Warranty/Warrantypendingapproval";
-import PaymentTable from "./pages/ModelDetails/PaymentTable";
+import PaymentTable from "./pages/ModelDetails/UserPaymentHistory/PaymentTable";
+import userPayments from "./pages/ModelDetails/UserPaymentHistory/userPayments";
 
 const UserProfilepage = lazy(() =>
   import("./modules/UserProfile/UserProfilePage")
@@ -39,36 +40,73 @@ export default function BasePage() {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [RoleRoute, setRoleRoute] = useState("");
-  const handleAPIRefresh = () => {
-    setInterval(() => {
-      var obj = {
-        token: localStorage.getItem("authToken"),
-        refreshToken: localStorage.getItem("refToken"),
-      };
-      const reqoption = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "melbeez-platform": "AdminPortal",
-        },
-        body: JSON.stringify(obj),
-      };
-      fetch(
-        `${process.env.REACT_APP_API_URL}/api/user/refresh-token`,
-        reqoption
-      )
-        .then((res) => {
-          return res.json();
-        })
-        .then(() => {
-          localStorage.clear();
-          handleShow();
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }, 7000000);
+  const handleAPIRefresh  = () => {
+    const refreshInterval =   30 * 60 * 1000; // Refresh every 30 minutes
+  
+    setInterval(async () => {
+      const authToken = localStorage.getItem("authToken");
+      const refreshToken = localStorage.getItem("refToken");
+  
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/user/refresh-token`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "melbeez-platform": "AdminPortal",
+            },
+            body: JSON.stringify({ token: authToken, refreshToken }),
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error("Failed to refresh token");
+        }
+  
+        const data = await response.json();
+        console.log(data)
+        localStorage.setItem("authToken", data.result.token);
+        localStorage.setItem("refToken", data.result.refreshToken);
+      } catch (error) {
+        //console.error("Token refresh failed:", error);
+        setShow(true);
+      }
+    }, refreshInterval);
   };
+  // const handleAPIRefresh = () => {
+  //   setInterval(() => {
+  //     var obj = {
+  //       token: localStorage.getItem("authToken"),
+  //       refreshToken: localStorage.getItem("refToken"),
+  //     };
+  //     const reqoption = {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "melbeez-platform": "AdminPortal",
+  //       },
+  //       body: JSON.stringify(obj),
+  //     };
+  //     fetch(
+  //       `${process.env.REACT_APP_API_URL}/api/user/refresh-token`,
+  //       reqoption
+  //     )
+  //       .then((res) => {
+  //         return res.json();
+  //       })
+  //       .then(() => {
+  //         localStorage.setItem("authToken");
+  //         localStorage.setItem("refToken");
+  //         //localStorage.clear();
+  //         //setShow(true);
+  //         //handleShow();
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //       });
+  //   }, 10000);
+  // };
   useEffect(() => {
     handleAPIRefresh();
   }, []);
@@ -85,6 +123,9 @@ export default function BasePage() {
       };
       fetch(`${process.env.REACT_APP_API_URL}/api/user`, reqoption)
         .then((res) => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
           return res.json();
         })
         .then((result) => {
@@ -139,7 +180,7 @@ export default function BasePage() {
           <Route path="/model-details" component={AllData} />
           <Route path="/feed" component={Feed} />
           <Route path="/warranty" component={Warranty} />
-          {/* <Route path="/payment" component={PaymentTable} /> */}
+          <Route path="/payment" component={userPayments} /> 
           <Route path="/approval" component={WarrantyApproval} />
           <Route path="/product-queue" component={ProductQueueTable} />
           <Route

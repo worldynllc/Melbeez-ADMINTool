@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import { showErrorToast, showSuccessToast } from "../../../../Utility/toastMsg";
+import { showErrorToast} from "../../../../Utility/toastMsg";
 
 const AddEditModalApproval = ({
   show,
@@ -27,7 +27,7 @@ const AddEditModalApproval = ({
       });
     }
   }, [formData, setFormData]);
-  const [fileError, setFileError] = useState("");
+  
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;

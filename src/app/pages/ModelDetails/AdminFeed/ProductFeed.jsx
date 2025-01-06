@@ -25,17 +25,19 @@ export default function ProductFeed({
   const [descriptionError, setDescriptionError] = useState("");
   const [fileError, setFileError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { userDetails,handleUpload } = useAuth();
+  const {  handleUpload } = useAuth();
 
   useEffect(() => {
-    if ( userDetails && !formData.author) {
-      const fullName = `${userDetails.result.firstName} ${userDetails.result.lastName}`;
+    if (!formData.author) {
+      const firstName = localStorage.getItem("firstName")
+      const lastName = localStorage.getItem("lastName")
+      const fullName = `${firstName} ${lastName}`;
       setFormData((prevFormData) => ({
         ...prevFormData,
         author: fullName,
       }));
     }
-  }, [userDetails, formData.author]);
+  }, [formData.author]);
 
   const handleClose = () => {
     setFormData({
@@ -81,7 +83,6 @@ export default function ProductFeed({
       });
     }
   };
-
   const handleChange = (e) => {
     const value = e.target.value;
     if (value.length > 200) {
@@ -110,7 +111,7 @@ export default function ProductFeed({
     }
 
     if (!descriptionError && !fileError) {
-      setLoading(true); 
+      setLoading(true);
       try {
         await handleUpload(formData, setMessage, setFormData);
         handleClose();
@@ -141,8 +142,8 @@ export default function ProductFeed({
             </CardHeaderToolbar>
           </CardHeader>
         )}
-        <CardBody style={{ justifyContent: "center"}}>
-          <FeedCard/>
+        <CardBody style={{ justifyContent: "center" }}>
+          <FeedCard />
         </CardBody>
       </Card>
       {/* -----  Upload  Modal ---- */}
@@ -168,11 +169,11 @@ export default function ProductFeed({
               <Form.Label htmlFor="author">Author</Form.Label>
               <Form.Control
                 type="text"
-                id="author" 
+                id="author"
                 name="author"
                 value={formData.author}
                 onChange={(e) => {
-                  handleChange(e); 
+                  handleChange(e);
                 }}
                 required
               />
@@ -194,7 +195,7 @@ export default function ProductFeed({
                   handleChange(e); // Only update the state if input is valid
                 }}
                 placeholder="Enter a description (max 200 characters)"
-                isInvalid={!!descriptionError} // Show invalid styling when there's an error
+                isInvalid={!!descriptionError} 
               />
               <Form.Control.Feedback type="invalid">
                 {descriptionError}
@@ -269,7 +270,7 @@ export default function ProductFeed({
                 type="submit"
                 disabled={loading}
               >
-               {loading ? "Uploading..." : "Upload"} 
+                {loading ? "Uploading..." : "Upload"}
               </Button>
             </div>
           </Modal.Body>

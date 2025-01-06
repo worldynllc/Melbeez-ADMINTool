@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState,  useRef } from "react";
 import { Table, Form } from "react-bootstrap"; 
 import { TablePagination } from "@material-ui/core";
 import ActionButtons from "../WarrantyButtonComponent/ActionButttons";
@@ -97,6 +97,7 @@ const WarrantypendingapprovalTable = ({
                 <th>
                   <Form.Check
                     type="checkbox"
+                    id="checkbox"
                     onChange={handleSelectAll}
                     checked={
                       filteredData.length > 0 &&
@@ -115,6 +116,7 @@ const WarrantypendingapprovalTable = ({
                   <td>
                     <Form.Check
                       type="checkbox"
+                      id={`checkbox-${index}`}
                       checked={selectedIds.includes(item.id)}
                       onChange={() => {
                         const newSelectedIds = selectedIds.includes(item.id)

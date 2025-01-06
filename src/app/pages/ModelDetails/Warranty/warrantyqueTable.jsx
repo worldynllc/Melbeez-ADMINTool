@@ -27,8 +27,8 @@ const WarrantyProductQueueTable = ({
   isApproved = false,
 }) => {
   const [warrantyData, setWarrantyData] = useState([]);
-  const [loading, setLoading] = useState(true); 
-  const [fileError, setFileError] = useState("");
+  const [loading, setLoading] = useState(true);
+  // const [fileError, setFileError] = useState("");
   const [columns] = useState([
     { dataField: "warrantyId", text: "Warranty ID", headerSortingClasses },
     { dataField: "vendor", text: "Vendor", headerSortingClasses },
@@ -170,8 +170,6 @@ const WarrantyProductQueueTable = ({
   const [searchTerms, setSearchTerms] = useState({});
   const [commonSearchTerm, setCommonSearchTerm] = useState("");
   const {
-    userDetails,
-  
     handleUploadwarrenty,
     handleUpdateWarranty,
   } = useAuth();
@@ -179,17 +177,20 @@ const WarrantyProductQueueTable = ({
   useEffect(() => {
     fetchData();
   }, []);
-
+  const firstName = localStorage.getItem("firstName")
+  const lastName = localStorage.getItem("lastName")
   useEffect(() => {
-    if (!loading && userDetails && !formData.author) {
-      const fullName = `${userDetails.result.firstName} ${userDetails.result.lastName}`;
+    if (!loading ) {
+      const firstName = localStorage.getItem("firstName")
+      const lastName = localStorage.getItem("lastName")
+      const fullName = `${firstName} ${lastName}`;
       setFormData((prevFormData) => ({
         ...prevFormData,
         created_by: fullName,
         updated_by: fullName,
       }));
     }
-  }, [userDetails, loading, formData.author]);
+  }, [loading]);
 
   const fetchData = async () => {
     setLoading(true); // Set loading to true when data fetch starts
@@ -206,11 +207,11 @@ const WarrantyProductQueueTable = ({
       setData(data);
     } catch (error) {
       // console.error("Error fetching data:", error);
-    }finally{
+    } finally {
 
-    
-        setLoading(false); // Set loading to false when data fetch is complete
- 
+
+      setLoading(false); // Set loading to false when data fetch is complete
+
     }
   };
 
@@ -235,9 +236,6 @@ const WarrantyProductQueueTable = ({
       pictureLink: row.pictureLink,
       other_Details: row.other_Details,
       product_price_ids: row.product_price_ids,
-      // terms_conditions: row.terms_conditions,
-      // created_by: row.created_by,
-      // updated_by: row.updated_by,
     });
     setShowViewModal(true);
   };
@@ -249,7 +247,7 @@ const WarrantyProductQueueTable = ({
   const handleEdit = (row) => {
     setFormData({
       warrantyId: row.warrantyId,
-      status: row.status,
+      //status: row.status,
       id: row.id,
       vendor: row.vendor,
       name: row.name,
@@ -261,11 +259,8 @@ const WarrantyProductQueueTable = ({
       status: "Pending",
       other_Details: row.other_Details,
       product_price_ids: row.product_price_ids,
-
-      // terms_conditions: row.terms_conditions,
-      // created_by: row.created_by,
       updated_by:
-        userDetails.result.firstName + "" + userDetails.result.lastName,
+        firstName + "" + lastName,
     });
     setShowAddEditModal(true);
   };
@@ -352,7 +347,7 @@ const WarrantyProductQueueTable = ({
       // console.error("Export to Excel error:", error);
     }
   };
-
+ //Filters data based on individual column search
   const handleSearchChange = (e, column) => {
     const searchValue = e.target.value.toLowerCase();
     setSearchTerms((prevSearchTerms) => ({
@@ -370,6 +365,8 @@ const WarrantyProductQueueTable = ({
 
     setFilteredData(filtered);
   };
+  
+//Filters data based on a single input field that applies across all columns
 
   const handleCommonSearchChange = (e) => {
     const searchValue = e.target.value.toLowerCase();
@@ -391,9 +388,11 @@ const WarrantyProductQueueTable = ({
       <Card>
         <CardHeader title={title}>
           <CardHeaderToolbar>
-            <div>
+      
+          <div>
               <select
                 name="statusSelect"
+                aria-labelledby="statusSelect"
                 id="statusSelect"
                 onChange={handleFilter}
                 style={{
@@ -414,11 +413,12 @@ const WarrantyProductQueueTable = ({
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
               </select>
-            </div>
+              </div>
             <div className="d-flex">
               <div>
                 <input
                   type="search"
+                  id="searchInput"
                   className="form-control"
                   placeholder="Search all warranty..."
                   onChange={handleCommonSearchChange}
@@ -455,29 +455,29 @@ const WarrantyProductQueueTable = ({
           </CardHeaderToolbar>
         </CardHeader>
         <CardBody style={{ justifyContent: "center" }}>
-          
-        {loading ? ( // Display a loading spinner while data is being fetched
+
+          {loading ? ( // Display a loading spinner while data is being fetched
             <div className="text-center">
               <Spinner animation="border" role="status">
                 <span className="sr-only">Loading...</span>
               </Spinner>
             </div>
           ) : (
-          <WarrantyTable
-            columns={columns}
-            data={filteredData}
-            currentPage={currentPage}
-            itemsPerPage={itemsPerPage}
-            handlePending={handlePending}
-            handleEdit={handleEdit}
-            handleDelete={handleDeleteConfirmation}
-            paginate={setCurrentPage}
-            searchInputRefs={searchInputRefs}
-            handleSearchChange={handleSearchChange}
-            // handlePendingSubmission={handlePendingSubmission}
-            handleRowClick={handleRowClick} // Pass handleRowClick to the table
-          />
-        )}
+            <WarrantyTable
+              columns={columns}
+              data={filteredData}
+              currentPage={currentPage}
+              itemsPerPage={itemsPerPage}
+              handlePending={handlePending}
+              handleEdit={handleEdit}
+              handleDelete={handleDeleteConfirmation}
+              paginate={setCurrentPage}
+              searchInputRefs={searchInputRefs}
+              handleSearchChange={handleSearchChange}
+              // handlePendingSubmission={handlePendingSubmission}
+              handleRowClick={handleRowClick} // Pass handleRowClick to the table
+            />
+          )}
           <AddUpload
             // handleFileChange={handleFileChange}
             setFormData={setFormData}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import { showErrorToast, showSuccessToast } from "../../../../Utility/toastMsg";
+import { showErrorToast } from "../../../../Utility/toastMsg";
 
 const AddUpload = ({
   show,
@@ -124,9 +124,10 @@ const AddUpload = ({
               marginRight: "8px",
             }}
           >
-            <Form.Label>* Vendor Name</Form.Label>
+            <Form.Label htmlFor="vendor">* Vendor Name</Form.Label>
             <Form.Control
               type="text"
+              id="vendor"
               autoComplete="off"
               placeholder="Vendor Name"
               name="vendor"
@@ -147,9 +148,10 @@ const AddUpload = ({
               marginRight: "8px",
             }}
           >
-            <Form.Label>* Name</Form.Label>
+            <Form.Label htmlFor="name">* Name</Form.Label>
             <Form.Control
               type="text"
+              id="name"
               autoComplete="off"
               placeholder="Name"
               name="name"
@@ -170,9 +172,10 @@ const AddUpload = ({
               marginRight: "8px",
             }}
           >
-            <Form.Label>* Monthly Price</Form.Label>
+            <Form.Label htmlFor="monthlyprice">* Monthly Price</Form.Label>
             <Form.Control
               type="text"
+              id="monthlyprice"
               autoComplete="off"
               placeholder="Monthly Price"
               name="monthlyPrice"
@@ -193,9 +196,10 @@ const AddUpload = ({
               marginRight: "8px",
             }}
           >
-            <Form.Label>* Annual Price</Form.Label>
+            <Form.Label htmlFor="annualprice">* Annual Price</Form.Label>
             <Form.Control
               type="text"
+              id="annualprice"
               autoComplete="off"
               placeholder="Annual Price"
               name="annualPrice"
@@ -216,9 +220,10 @@ const AddUpload = ({
               marginRight: "8px",
             }}
           >
-            <Form.Label>Discount</Form.Label>
+            <Form.Label htmlFor="discount">Discount</Form.Label>
             <Form.Control
               type="text"
+              id="discount"
               autoComplete="off"
               placeholder="Discount"
               name="discount"
@@ -236,9 +241,10 @@ const AddUpload = ({
               marginRight: "8px",
             }}
           >
-            <Form.Label>* Price Id</Form.Label>
+            <Form.Label htmlFor="priceid">* Price Id</Form.Label>
             <Form.Control
               type="text"
+              id="priceid"
               autoComplete="off"
               placeholder="Price Id"
               name="product_price_ids"
@@ -257,9 +263,10 @@ const AddUpload = ({
               marginRight: "8px",
             }}
           >
-            <Form.Label>* Plan description</Form.Label>
+            <Form.Label htmlFor="plandescription">* Plan description</Form.Label>
             <Form.Control
               type="text"
+              id="plandescription"
               autoComplete="off"
               placeholder="Plan description"
               name="planDescription"
@@ -275,9 +282,10 @@ const AddUpload = ({
             </Form.Control.Feedback>
           </div>
           <Form.Group>
-            <Form.Label>* Others</Form.Label>
+            <Form.Label htmlFor="others">* Others</Form.Label>
             <Form.Control
               as="textarea"
+              id="others"
               rows={3}
               name="other_Details"
               placeholder="input must be separated by a comma {Ex: Protect any phone, Accidental damage,}"
@@ -299,9 +307,10 @@ const AddUpload = ({
               marginTop:"8px"
             }}
           >
-            <Form.Label>* Plan Name</Form.Label>
+            <Form.Label htmlFor="planname">* Plan Name</Form.Label>
             <Form.Control
               type="text"
+               id="planname"
               autoComplete="off"
               placeholder="Plan Name"
               name="planName"
@@ -324,7 +333,7 @@ const AddUpload = ({
               
             }}
           >
-              <Form.Label>* File</Form.Label>
+              <Form.Label  id="file">* File</Form.Label>
             <div className="border border-gray-100 border-2 p-2 " style={{width:"100%"}}>
               <input
                 type="file"
@@ -341,7 +350,7 @@ const AddUpload = ({
               marginTop:"8px",
               
             }} >
-            <Form.Label>* Selected File</Form.Label>
+            <Form.Label  id="selectedfile">* Selected File</Form.Label>
             <div  >
               {formData.file ? (
                 formData.file.type.startsWith("image/") ? (

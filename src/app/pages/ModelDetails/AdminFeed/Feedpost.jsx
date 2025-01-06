@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card } from "react-bootstrap";
 import { toAbsoluteUrl } from "../../../../_metronic/_helpers";
 import SVG from "react-inlinesvg";
 
 // import "./FeedCard.css";
-const FeedPost = ({ post,isLiked,  createLikes ,onplay,  playingVideoId, setPlayingVideoId,  handleCommentClick, 
+const FeedPost = ({ post,isLiked,  createLikes ,  playingVideoId, setPlayingVideoId,  handleCommentClick, 
     calculatePostAge,
     handleDeleteClick,
     preventLinkDefault,}) => {
@@ -23,7 +23,44 @@ const FeedPost = ({ post,isLiked,  createLikes ,onplay,  playingVideoId, setPlay
             setLiked(liked);
           }
         };
-
+       
+        const videoRef = useRef(null);
+        useEffect(() => {
+          const videoElement = videoRef.current;
+      
+          // Check if IntersectionObserver is supported
+          if (!videoElement || typeof IntersectionObserver === "undefined") return;
+      
+          const observer = new IntersectionObserver(
+            ([entry]) => {
+              if (entry.isIntersecting) {
+                //console.log(`Video ${post.id} is in view`);
+                if (playingVideoId === post.id) {
+                  videoElement.play().catch((error) => {
+                    //console.warn("Playback failed:", error);
+                  });
+                }
+              } else {
+                //console.log(`Video ${post.id} is out of view`);
+                if (playingVideoId === post.id) {
+                  videoElement.pause();
+                  setPlayingVideoId(null); // Reset playing video ID
+                }
+              }
+            },
+            {
+              threshold: .3, // Trigger when 50% of the video is in the viewport
+            }
+          );
+      
+          observer.observe(videoElement);
+      
+          // Cleanup when the component unmounts
+          return () => {
+            observer.disconnect();
+          };
+        }, [post.id, playingVideoId, setPlayingVideoId]);
+      
   return (
     <div key={post.id} >
       <Card className="feed-card">
@@ -44,30 +81,20 @@ const FeedPost = ({ post,isLiked,  createLikes ,onplay,  playingVideoId, setPlay
         </div>
         {post.link.endsWith(".mp4") ? (
           <video
-            className="post-video"
-            controls
-            crossOrigin="anonymous"
-            src={post.link}
-            alt="Video Post"
-            style={{
-              height: "300px",
-              width: "100%",
-              objectFit: "contain",
-              background: "#1A1A27",
-            }}
-            onClick={onplay}
-            // onPause={() => {
-            //   if (playingVideoId === post.id) {
-            //     setPlayingVideoId(null); // Reset playing video on pause
-            //   }
-            // }}
-            onPlay={() => {
-              if (playingVideoId !== post.id) {
-                setPlayingVideoId(post.id); // Set the current video as playing
-              }
-            }}
-            autoPlay={playingVideoId === post.id} // Only autoplay if
-          />
+          ref={videoRef}
+          className="post-video"
+          controls
+          crossOrigin="anonymous"
+          src={post.link}
+          alt="Video Post"
+          style={{
+            height: "300px",
+            width: "500px",
+            objectFit: "contain",
+            background: "#1A1A27",
+          }}
+          onPlay={() => setPlayingVideoId(post.id)}
+        />
         ) : (
           <img
             className="post-img"
@@ -75,11 +102,11 @@ const FeedPost = ({ post,isLiked,  createLikes ,onplay,  playingVideoId, setPlay
             src={post.link}
             style={{
               height: "300px",
-              width: "100%",
+              width: "500px",
               objectFit: "contain",
               background: "#1A1A27",
             }}
-            alt="Image Post"
+          alt="post"
           />
         )}
         <Card.Body>

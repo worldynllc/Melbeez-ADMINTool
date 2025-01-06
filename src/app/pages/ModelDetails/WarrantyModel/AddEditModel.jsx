@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import { showErrorToast, showSuccessToast } from "../../../../Utility/toastMsg";
+import { showErrorToast } from "../../../../Utility/toastMsg";
 
 const AddEditModal = ({
   show,
@@ -11,7 +11,7 @@ const AddEditModal = ({
   setFormData,
 }) => {
   const [validated, setValidated] = useState(false);
-  const [fileError, setFileError] = useState("");
+  
 
   useEffect(() => {
     if (formData === undefined) {
@@ -92,9 +92,10 @@ const AddEditModal = ({
 
           <div className="d-flex flex-wrap">
             <div className="p-2 flex-fill" style={{ width: "48%" }}>
-              <Form.Label>* Vendor Name</Form.Label>
+              <Form.Label htmlFor="vendor">* Vendor Name</Form.Label>
               <Form.Control
                 type="text"
+                id="vendor"
                 autoComplete="off"
                 placeholder="Vendor Name"
                 name="vendor"
@@ -109,9 +110,10 @@ const AddEditModal = ({
               </Form.Control.Feedback>
             </div>
             <div className="p-2 flex-fill" style={{ width: "48%" }}>
-              <Form.Label>* Name</Form.Label>
+              <Form.Label  htmlFor="name">* Name</Form.Label>
               <Form.Control
                 type="text"
+                 id="name"
                 autoComplete="off"
                 placeholder="name"
                 name="name"
@@ -126,9 +128,10 @@ const AddEditModal = ({
               </Form.Control.Feedback>
             </div>
             <div className="p-2 flex-fill" style={{ width: "48%" }}>
-              <Form.Label>* Monthly Price</Form.Label>
+              <Form.Label htmlFor="monthlyprice">* Monthly Price</Form.Label>
               <Form.Control
                 type="text"
+                 id="monthlyprice"
                 autoComplete="off"
                 placeholder="Monthly Price"
                 name="monthlyPrice"
@@ -143,9 +146,10 @@ const AddEditModal = ({
               </Form.Control.Feedback>
             </div>
             <div className="p-2 flex-fill" style={{ width: "48%" }}>
-              <Form.Label>* Annual Price</Form.Label>
+              <Form.Label htmlFor="annualprice">* Annual Price</Form.Label>
               <Form.Control
                 type="text"
+                 id="annualprice"
                 autoComplete="off"
                 placeholder="Annual Price"
                 name="annualPrice"
@@ -160,9 +164,10 @@ const AddEditModal = ({
               </Form.Control.Feedback>
             </div>
             <div className="p-2 flex-fill" style={{ width: "48%" }}>
-              <Form.Label>* Discount</Form.Label>
+              <Form.Label  htmlFor="discount">* Discount</Form.Label>
               <Form.Control
                 type="text"
+                id="discount"
                 autoComplete="off"
                 placeholder="Discount"
                 name="discount"
@@ -178,9 +183,10 @@ const AddEditModal = ({
             </div>
 
             <div className="p-2 flex-fill" style={{ width: "48%" }}>
-              <Form.Label>* Price Id</Form.Label>
+              <Form.Label htmlFor="priceid">* Price Id</Form.Label>
               <Form.Control
                 type="text"
+                id="priceid"
                 autoComplete="off"
                 placeholder="price Id"
                 name="product_price_ids"
@@ -195,9 +201,10 @@ const AddEditModal = ({
             </div>
 
             <div className="p-2 flex-fill" style={{ width: "48%" }}>
-              <Form.Label>planDescription</Form.Label>
+              <Form.Label htmlFor="plandescription">planDescription</Form.Label>
               <Form.Control
                 type="text"
+                 id="plandescription"
                 autoComplete="off"
                 placeholder="planDescription"
                 name="planDescription"
@@ -213,9 +220,10 @@ const AddEditModal = ({
             </div>
             <div className="p-2 flex-fill" style={{ width: "100%" }}>
               <Form.Group>
-                <Form.Label>* Others</Form.Label>
+                <Form.Label htmlFor="others">* Others</Form.Label>
                 <Form.Control
                   as="textarea"
+                   id="others"
                   rows={3}
                   name="other_Details"
                   className="mb-3"
@@ -229,9 +237,10 @@ const AddEditModal = ({
               </Form.Group>
             </div>
             <div className="p-2 flex-fill" style={{ width: "48%" }}>
-              <Form.Label>Plan Name</Form.Label>
+              <Form.Label htmlFor="planname">Plan Name</Form.Label>
               <Form.Control
                 type="text"
+                   id="planname"
                 autoComplete="off"
                 placeholder="Plan Name"
                 name="planName"
