@@ -1,4 +1,3 @@
-// AuthProvider.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { authUserDetail } from "../../services/ProfileService";
 import {
@@ -13,16 +12,13 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [postData, setPostData] = useState([]);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [setShowAddModal] = useState(false);
   const [postcomments, setPostcomments] = useState([]);
   const [likedetails, setLikeDetails] = useState([]);
   const [filterdata, setfilterdata] = useState([]);
 
-
   const token = localStorage.getItem("authToken");
 
-
-  // Helper function to add authorization headers
   const getAuthorizedHeaders = () => ({
     authorization: `Bearer ${token}`,
   });
@@ -33,7 +29,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       setLoading(true);
-      try { 
+      try {
         const response = await authUserDetail();
         if (!response.ok) {
           throw new Error("Failed to fetch user details");
@@ -53,7 +49,7 @@ export const AuthProvider = ({ children }) => {
     };
     fetchUserDetails();
   }, []);
-  const fetchFeeds = async (page = 0, size=3) => {
+  const fetchFeeds = async (page = 0, size = 3) => {
     try {
       const response = await fetch(
         `${process.env.REACT_APP_JAVA_API_URL}/feed/all?page=${page}&size=${size}`,
@@ -64,27 +60,28 @@ export const AuthProvider = ({ children }) => {
           },
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to fetch feeds");
       }
       const data = await response.json();
-  
-      // Sort the fetched data by createdAt field in descending order
+
       data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  
-     
+
       return data;
-  
     } catch (error) {
-      
-      
       return [];
     }
   };
-  
-  
-  const handleUpload = async (formData, setMessage, setFormData, setShow, page = 0, size = 3) => {
+
+  const handleUpload = async (
+    formData,
+    setMessage,
+    setFormData,
+    setShow,
+    page = 0,
+    size = 3
+  ) => {
     if (!formData.author) {
       setMessage("Author is required.");
       showWarnToast("Please fill in all required fields.");
@@ -96,7 +93,7 @@ export const AuthProvider = ({ children }) => {
       setShow(true);
       return;
     }
-  
+
     const form = new FormData();
     form.append("author", formData.author);
     if (formData.file) {
@@ -108,7 +105,7 @@ export const AuthProvider = ({ children }) => {
     if (userDetails) {
       form.append("userId", userDetails.result.id);
     }
-  
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_JAVA_API_URL}/feed/upload`,
@@ -117,12 +114,11 @@ export const AuthProvider = ({ children }) => {
           method: "POST",
           headers: {
             ...getAuthorizedHeaders(),
-            // Do not include 'Content-Type', as the browser handles it for FormData
           },
           body: form,
         }
       );
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         const errorMessage = errorData.error || "Unknown error occurred.";
@@ -131,22 +127,13 @@ export const AuthProvider = ({ children }) => {
         showErrorToast(errorMessage);
         return;
       }
-  
+
       showSuccessToast("Upload feed successful");
       setFormData({
         author: "",
         description: "",
         file: null,
       });
-  
-      // Fetch updated feeds with pagination after upload
-      const updatedFeeds = await fetchFeeds(page, size);
-      if (updatedFeeds) {
-        setPostData(updatedFeeds);
-        fetchLikesdetails();  // Update likes after feed upload
-      }
-      // Optionally, call any other functions to refresh data
-  
     } catch (error) {
       const errorMessage = "Error uploading file";
       setMessage(errorMessage);
@@ -154,7 +141,7 @@ export const AuthProvider = ({ children }) => {
       setShow(true);
     }
   };
-  
+
   const handleDeletePost = async (postId) => {
     try {
       const response = await fetch(
@@ -163,7 +150,6 @@ export const AuthProvider = ({ children }) => {
           method: "DELETE",
           headers: {
             ...getAuthorizedHeaders(),
-            // Do not include 'Content-Type', as the browser handles it for FormData
           },
         }
       );
@@ -178,7 +164,6 @@ export const AuthProvider = ({ children }) => {
       showErrorToast("Error deleting post: " + error.message);
     }
   };
-  //Warranty API
 
   const handleUploadwarrenty = async (
     formData,
@@ -186,7 +171,6 @@ export const AuthProvider = ({ children }) => {
     setFormData,
     setShow
   ) => {
-    // Check required fields
     if (
       !formData.vendor ||
       !formData.name ||
@@ -202,31 +186,28 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-   
     const firstName = localStorage.getItem("firstName");
-   
+
     const lastName = localStorage.getItem("lastName");
-    
+
     if (!firstName && !lastName) {
       showErrorToast("User details not found.");
       return;
     }
-   const userId=localStorage.getItem("userId");
-    // Create FormData payload
+    const userId = localStorage.getItem("userId");
     const form = new FormData();
     form.append("vendor", formData.vendor);
     form.append("name", formData.name);
     form.append("monthlyPrice", formData.monthlyPrice);
     form.append("annualPrice", formData.annualPrice);
-    form.append("discount", formData.discount || "0"); // Optional field
-    form.append("created_by", firstName + " " + lastName); // Use userId from userDetails
-    form.append("updated_by", ""); // Use userId from userDetails
+    form.append("discount", formData.discount || "0");
+    form.append("created_by", firstName + " " + lastName);
+    form.append("updated_by", "");
     form.append("planDescription", formData.planDescription);
     form.append("planName", formData.planName);
     form.append("product_price_ids", formData.product_price_ids);
     form.append("other_Details", formData.other_Details);
-    form.append("userId",userId);
-    // Append file if it exists
+    form.append("userId", userId);
     if (formData.file) {
       form.append("file", formData.file);
     }
@@ -236,7 +217,7 @@ export const AuthProvider = ({ children }) => {
         `${process.env.REACT_APP_JAVA_API_URL}/warranty/upload`,
         {
           method: "POST",
-          headers:{ ...getAuthorizedHeaders(),},
+          headers: { ...getAuthorizedHeaders() },
           body: form,
         }
       );
@@ -265,13 +246,10 @@ export const AuthProvider = ({ children }) => {
       });
       setShowAddModal(false);
       showSuccessToast("Upload successful");
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   };
 
   const handleUpdateWarranty = async (formData) => {
-    
     try {
       const response = await fetch(
         `${process.env.REACT_APP_JAVA_API_URL}/warranty/${formData.id}`,
@@ -280,7 +258,7 @@ export const AuthProvider = ({ children }) => {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            ...getAuthorizedHeaders()
+            ...getAuthorizedHeaders(),
           },
           body: JSON.stringify(formData),
         }
@@ -288,9 +266,9 @@ export const AuthProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error("Failed to update warranty.");
       }
-      return response.json(); // Optionally return data or handle success
+      return response.json();
     } catch (error) {
-      throw new Error(error.message); // Throw error to be caught by the calling component
+      throw new Error(error.message);
     }
   };
   const handleDeleteWarranty = async (warrantyId) => {
@@ -300,8 +278,8 @@ export const AuthProvider = ({ children }) => {
         {
           method: "DELETE",
           headers: {
-            ...getAuthorizedHeaders()
-          }
+            ...getAuthorizedHeaders(),
+          },
         }
       );
       if (!response.ok) {
@@ -316,7 +294,6 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  //Comment API
   const fetchComments = async (feedId) => {
     try {
       const response = await fetch(
@@ -324,7 +301,6 @@ export const AuthProvider = ({ children }) => {
         {
           headers: {
             ...getAuthorizedHeaders(),
-            // Do not include 'Content-Type', as the browser handles it for FormData
           },
         }
       );
@@ -332,15 +308,14 @@ export const AuthProvider = ({ children }) => {
         throw new Error("Failed to fetch comments");
       }
       const data = await response.json();
-      // Sort comments by createdAt (most recent first)
+
       data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setPostcomments(data); // Update state with sorted comments
+      setPostcomments(data);
     } catch (error) {
       showErrorToast("No comment found");
-      
     }
   };
-  
+
   const createComment = async (postId, userId, commentText, userName) => {
     try {
       const response = await fetch(
@@ -349,30 +324,28 @@ export const AuthProvider = ({ children }) => {
           method: "POST",
           headers: {
             ...getAuthorizedHeaders(),
-            "Content-Type": "application/json", // Ensure the content type is JSON
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            text: commentText, // Pass the comment text in the body
+            text: commentText,
           }),
         }
       );
-  
+
       if (!response.ok) {
         throw new Error("Failed to upload comment");
       }
-  
+
       const data = await response.json();
-      
+
       showSuccessToast("Comment added successfully");
-      return data; // Return the created comment data
+      return data;
     } catch (error) {
-      
       showErrorToast("Failed to add comment");
-      throw error; // Re-throw error for handling in calling function
+      throw error;
     }
   };
-  
-  
+
   const handleDeleteComment = async (feedId, commentId) => {
     try {
       const response = await fetch(
@@ -381,34 +354,30 @@ export const AuthProvider = ({ children }) => {
           method: "DELETE",
           headers: {
             ...getAuthorizedHeaders(),
-      
           },
         }
       );
       if (!response.ok) {
         throw new Error("Failed to delete comment");
       }
-   
+
       await fetchComments(feedId);
 
       showSuccessToast("comment deleted successfully");
-    
     } catch (error) {
       showErrorToast("Error deleting comment: " + error.message);
     }
   };
 
-  //Like API
   const createLikes = async (feedId) => {
     try {
-  
-
       const response = await fetch(
         `${process.env.REACT_APP_JAVA_API_URL}/like/${feedId}/${userId}/${userName}`,
         {
           method: "POST",
           headers: {
-            ...getAuthorizedHeaders()
+            ...getAuthorizedHeaders(),
+            "Content-Type": "application/json",
           },
         }
       );
@@ -416,12 +385,8 @@ export const AuthProvider = ({ children }) => {
       if (!response.ok) {
         throw new Error("Failed to add Like");
       }
-      const data = await response.json();
- 
-     
     } catch (error) {
-   
-      showErrorToast("Failed to add Like");
+      console.error("Error adding like:", error);
     }
   };
   const fetchLikesdetails = async () => {
@@ -429,11 +394,10 @@ export const AuthProvider = ({ children }) => {
       const response = await fetch(
         `${process.env.REACT_APP_JAVA_API_URL}/like/all`,
         {
-          method:"GET",
+          method: "GET",
           mode: "cors",
           headers: {
             ...getAuthorizedHeaders(),
-            // Do not include 'Content-Type', as the browser handles it for FormData
           },
         }
       );
@@ -442,10 +406,8 @@ export const AuthProvider = ({ children }) => {
       }
       const data = await response.json();
       setLikeDetails(data);
-     
     } catch (error) {
-      showErrorToast("No likes found");
-     
+      console.log("no likes found");
     }
   };
 
@@ -466,20 +428,15 @@ export const AuthProvider = ({ children }) => {
       const data = await response.json();
       setTransactiondata(data);
       setfilterdata(data);
-      
     } catch (error) {
       showErrorToast("No Transaction Details found");
-      
     }
   };
-
-  
 
   return (
     <AuthContext.Provider
       value={{
         userDetails,
-        // loading,
         setPostcomments,
         postcomments,
         error,

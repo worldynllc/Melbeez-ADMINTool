@@ -25,8 +25,7 @@ function Transaction() {
     },
     { dataField: "vendor", text: "Vendor", headerSortingClasses },
     { dataField: "productName", text: "Product Name", headerSortingClasses },
-   
-   
+
     {
       dataField: "price",
       text: "Price",
@@ -40,58 +39,58 @@ function Transaction() {
       headerSortingClasses,
       formatter: (cell) => `$${parseFloat(cell).toFixed(2)}`,
     },
-   
+
     {
       dataField: "invoice_status",
       text: "Status",
       headerSortingClasses,
       formatter: (cell) => cell,
     },
-    // { dataField: "transactionId", text: "transactionId", headerSortingClasses },
+
     {
       dataField: "createdAt",
       text: "subscription Date",
       headerSortingClasses,
       formatter: (cell) => {
-        const trimmedCell = cell.slice(0, -5); // Remove the last 5 characters if needed
-        return moment(trimmedCell).format("DD-MM-YYYY"); // Display date in DD-MM-YYYY format directly
+        const trimmedCell = cell.slice(0, -5);
+        return moment(trimmedCell).format("DD-MM-YYYY");
       },
     },
   ]);
 
-  const { fetchTransactionDetails, transactiondata, loading,setfilterdata, filterdata} = useAuth();
+  const {
+    fetchTransactionDetails,
+    transactiondata,
+    loading,
+    setfilterdata,
+    filterdata,
+  } = useAuth();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Default 5 items per page
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [commonSearchTerm, setCommonSearchTerm] = useState("");
 
   useEffect(() => {
     fetchTransactionDetails();
   }, []);
 
-  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filterdata.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Change page handler
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  // Rows per page change handler
   const handleRowsPerPageChange = (e) => {
     setItemsPerPage(Number(e.target.value));
-    setCurrentPage(1); // Reset to first page when items per page changes
+    setCurrentPage(1);
   };
 
   const exportToExcel = () => {
     try {
-      // Ensure data is not empty
       if (!transactiondata || transactiondata.length === 0) {
         showErrorToast("No data to export.");
         return;
       }
 
-      // Filter out the 'id' field from each object in data
       const filteredData = transactiondata.map(({ id, ...rest }) => rest);
 
       const worksheet = XLSX.utils.json_to_sheet(filteredData);
@@ -101,22 +100,18 @@ function Transaction() {
       showSuccessToast("Data exported to Excel successfully.");
     } catch (error) {
       showErrorToast("Error exporting data to Excel.");
-      // console.error("Export to Excel error:", error);
     }
   };
 
-  
   const handleFilter = (e) => {
     const filterValue = e.target.value;
 
     if (filterValue === "") {
-      // If no filter is selected, show all data
-     
       setfilterdata(transactiondata);
     } else {
-      // Filter the data based on the selected status
       const filtered = transactiondata.filter(
-        (item) => item.invoice_status.toLowerCase() === filterValue.toLowerCase()
+        (item) =>
+          item.invoice_status.toLowerCase() === filterValue.toLowerCase()
       );
       setfilterdata(filtered);
     }
@@ -137,10 +132,6 @@ function Transaction() {
     setfilterdata(filtered);
   };
 
-
-
-    
-
   const renderhead = () => {
     return (
       <tr>
@@ -158,25 +149,25 @@ function Transaction() {
           <tr key={index}>
             {columns.map((col) => (
               <td key={col.dataField}>
-                {col.dataField === "createdAt" ? (
-                // Remove the last 5 characters from createdAt and format the date
-                moment(item[col.dataField].slice(0, -5)).format("DD-MM-YYYY")
-              ) : col.dataField === "interval" ? (
-                item[col.dataField] === "month" ? "Monthly" : 
-                item[col.dataField] === "year" ? "Yearly" : item[col.dataField]
-              ) : (
-                item[col.dataField]
-              )}
+                {col.dataField === "createdAt"
+                  ? moment(item[col.dataField].slice(0, -5)).format(
+                      "DD-MM-YYYY"
+                    )
+                  : col.dataField === "interval"
+                  ? item[col.dataField] === "month"
+                    ? "Monthly"
+                    : item[col.dataField] === "year"
+                    ? "Yearly"
+                    : item[col.dataField]
+                  : item[col.dataField]}
               </td>
-             
             ))}
           </tr>
         ))}
       </>
     );
   };
-  
-  // Pagination controls
+
   const pageNumbers = [];
   for (let i = 1; i <= Math.ceil(transactiondata.length / itemsPerPage); i++) {
     pageNumbers.push(i);
@@ -201,7 +192,6 @@ function Transaction() {
                   marginRight: "10px",
                   marginTop: "2px",
                   backgroundColor: "#fff",
-                  
                 }}
               >
                 <option value="" defaultValue>
@@ -222,13 +212,8 @@ function Transaction() {
                   value={commonSearchTerm}
                 />
               </div>
-             
             </div>
 
-
-           
-            
-                
             <div className="d-flex">
               <div>
                 <button
@@ -262,9 +247,8 @@ function Transaction() {
                   <tbody>{renderdata()}</tbody>
                 </Table>
               </div>
-              {/* Pagination and Rows Per Page at the bottom */}
+
               <div className="d-flex justify-content-between align-items-center">
-                {/* Rows Per Page Dropdown */}
                 <div>
                   <select
                     id="rowsPerPage"
@@ -283,11 +267,9 @@ function Transaction() {
                     <option value="10">10</option>
                     <option value="25">25</option>
                     <option value="50">50</option>
-             
-
                   </select>
                 </div>
-                {/* Pagination centered */}
+
                 <div className="d-flex justify-content-center w-100">
                   <Pagination>
                     {pageNumbers.map((number) => (

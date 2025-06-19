@@ -8,7 +8,7 @@ import FeedPost from "./Feedpost";
 import { calculatePostAge } from "../../../../Utility/calculateFeedAge";
 import "./FeedCard.css";
 
-function FeedCard() {
+function FeedCard({ feeds, setFeeds }) {
   const {
     handleDeletePost,
     fetchComments,
@@ -21,7 +21,6 @@ function FeedCard() {
     fetchFeeds,
   } = useAuth();
 
-  const [feeds, setFeeds] = useState([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [playingVideoId, setPlayingVideoId] = useState(null);
@@ -31,80 +30,70 @@ function FeedCard() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteType, setDeleteType] = useState(null);
   const [itemToDelete, setItemToDelete] = useState(null);
-  // Fetch feeds and likes on mount
+
+  const userId = localStorage.getItem("userId");
+  const userName = localStorage.getItem("userName");
+
   useEffect(() => {
     loadFeeds();
     fetchLikesdetails();
   }, []);
 
-  const loadFeeds = async () => {
+  const loadFeeds = async (pageToLoad = page, fresh = false) => {
     try {
-      const newFeeds = await fetchFeeds(page, 3); // Fetch 3 posts at a time
+      const newFeeds = await fetchFeeds(pageToLoad, 3);
+
       if (newFeeds.length === 0) {
         setHasMore(false);
-      } else {
-        // Sort posts by createdAt (most recent first)
-
-        setFeeds((prevFeeds) => [...prevFeeds, ...newFeeds]);
-        setPage((prevPage) => prevPage + 1);
+        return;
       }
+
+      const updatedFeeds = fresh ? newFeeds : [...feeds, ...newFeeds];
+      const sortedFeeds = updatedFeeds.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      setFeeds(sortedFeeds);
+      setPage((prevPage) => pageToLoad + 1);
     } catch (error) {
       console.error("Error fetching feeds:", error);
     }
   };
 
-  // Get user ID and name from local storage
-  const userId = localStorage.getItem("userId");
-  const userName = localStorage.getItem("userName");
-
-  // Handle comment submission
   const handleCommentClick = async (post) => {
     setSelectedPost(post);
-    await fetchComments(post.id); // Fetch comments for the selected post
+    await fetchComments(post.id);
     setShowCommentModal(true);
   };
 
   const handleCommentSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
-
-    if (!selectedPost || !commentText.trim()) return; // Ensure there's a selected post and comment text
-
+    e.preventDefault();
+    if (!selectedPost || !commentText.trim()) return;
     try {
-      // Create the comment
       const newComment = await createComment(
         selectedPost.id,
         userId,
         commentText,
         userName
       );
-
-      // Update local comments list without refetching
-      postcomments.push(newComment); // Add newly created comment to the list
-      setCommentText(""); // Clear input field after submission
-
-      // Sort comments by creation date (most recent first)
+      postcomments.push(newComment);
+      setCommentText("");
       postcomments.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
-
-      // Update the comment count for the selected post
       setFeeds((prevFeeds) =>
         prevFeeds.map((feed) =>
           feed.id === selectedPost.id
-            ? { ...feed, commentCount: feed.commentCount + 1 } // Increase the comment count by 1
+            ? { ...feed, commentCount: feed.commentCount + 1 }
             : feed
         )
       );
-
-      // Optionally refresh comments if needed
-      await fetchComments(selectedPost.id); // Refresh comments for the selected post
+      await fetchComments(selectedPost.id);
     } catch (error) {
-      
-      alert("Failed to submit comment. Please try again."); // Notify user of error
+      alert("Failed to submit comment. Please try again.");
     }
   };
 
-  // Handle delete click
   const handleDeleteClick = (item, type) => {
     setItemToDelete(item);
     setDeleteType(type);
@@ -115,57 +104,57 @@ function FeedCard() {
     try {
       if (deleteType === "post") {
         await handleDeletePost(itemToDelete.id);
+        setFeeds((prevFeeds) =>
+          prevFeeds.filter((feed) => feed.id !== itemToDelete.id)
+        );
       } else if (deleteType === "comment") {
         await handleDeleteComment(selectedPost.id, itemToDelete.id);
-
-        // Update the comment list with sorted comments after deletion
         setFeeds((prevFeeds) =>
           prevFeeds.map((feed) =>
             feed.id === selectedPost.id
               ? {
                   ...feed,
-                  commentCount: feed.commentCount - 1, // Decrease the comment count by 1
+                  commentCount: feed.commentCount - 1,
                   comments: feed.comments
                     ? feed.comments
-                        .filter((comment) => comment.id !== itemToDelete.id) // Filter comments
+                        .filter((comment) => comment.id !== itemToDelete.id)
                         .sort(
                           (a, b) =>
                             new Date(b.createdAt) - new Date(a.createdAt)
-                        ) // Sort comments by creation date
-                    : [], // If no comments, fallback to empty array
+                        )
+                    : [],
                 }
               : feed
           )
         );
+        await fetchComments(selectedPost.id);
       }
-
       setShowDeleteModal(false);
       setItemToDelete(null);
       setDeleteType(null);
-
-      // Optionally refresh comments if needed (but not feeds)
-      if (deleteType === "comment") {
-        await fetchComments(selectedPost.id); // Refresh comments if necessary
-      }
     } catch (error) {
-      
+      console.error("Delete failed:", error);
     }
   };
 
   const preventLinkDefault = (e) => e.preventDefault();
 
   const handleVideoPlay = (postId) => {
-    if (playingVideoId === postId) {
-      setPlayingVideoId(null); // Pause video if it's already playing
-    } else {
-      setPlayingVideoId(postId); // Set new video as playing
-    }
+    setPlayingVideoId((prevId) => (prevId === postId ? null : postId));
   };
 
   const isPostLikedByUser = (postId) => {
     return likedetails.some(
-      (like) => like.feed.id === postId && like.userId === userId
+      (like) => like.feed?.id === postId && like.userId === userId
     );
+  };
+  const handleLikeFromCard = async (postId) => {
+    try {
+      await createLikes(postId);
+      await fetchLikesdetails();
+    } catch (error) {
+      console.error("Error toggling like:", error);
+    }
   };
 
   return (
@@ -187,35 +176,32 @@ function FeedCard() {
           </p>
         }
       >
-        {feeds.map((post) => {
-          const isLiked = isPostLikedByUser(post.id); // Check if the post is liked by the user
-          return (
-            <div
-              key={post.id}
-              style={{
-                padding: "10px",
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              <FeedPost
-                post={post}
-                fetchComments={fetchComments}
-                createLikes={createLikes}
-                postcomments={post.comments}
-                onplay={handleVideoPlay}
-                playingVideoId={playingVideoId}
-                setPlayingVideoId={setPlayingVideoId}
-                onDelete={handleDeleteClick}
-                handleCommentClick={handleCommentClick}
-                preventLinkDefault={preventLinkDefault}
-                calculatePostAge={calculatePostAge(post.createdAt)}
-                isLiked={isLiked} // Pass liked status to FeedPost
-                commentCount={post.commentCount} // Pass the updated comment count to FeedPost
-              />
-            </div>
-          );
-        })}
+        {feeds.map((post) => (
+          <div
+            key={post.id}
+            style={{
+              padding: "10px",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <FeedPost
+              post={post}
+              fetchComments={fetchComments}
+              createLikes={handleLikeFromCard}
+              isLiked={isPostLikedByUser(post.id)}
+              postcomments={post.comments}
+              onplay={handleVideoPlay}
+              playingVideoId={playingVideoId}
+              setPlayingVideoId={setPlayingVideoId}
+              onDelete={handleDeleteClick}
+              handleCommentClick={handleCommentClick}
+              preventLinkDefault={preventLinkDefault}
+              calculatePostAge={calculatePostAge(post.createdAt)}
+              commentCount={post.commentCount}
+            />
+          </div>
+        ))}
       </InfiniteScroll>
 
       <DeleteModal
@@ -244,18 +230,14 @@ function FeedCard() {
               <p>No comments available.</p>
             )}
             <Form onSubmit={handleCommentSubmit}>
-              {" "}
-              {/* Prevent default form submission */}
-              <Form.Group controlId="commentText">
-                <Form.Label style={{ marginTop: "25px" }}>
-                  Type Your Comment
-                </Form.Label>
+              <Form.Group controlId="commentText" className="mt-4">
+                <Form.Label>Type Your Comment</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={1}
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
-                  required // Ensure this field is filled before submission
+                  required
                 />
               </Form.Group>
             </Form>
@@ -263,7 +245,6 @@ function FeedCard() {
           <Modal.Footer>
             <Button
               variant="secondary"
-              type="submit"
               onClick={() => setShowCommentModal(false)}
             >
               Close

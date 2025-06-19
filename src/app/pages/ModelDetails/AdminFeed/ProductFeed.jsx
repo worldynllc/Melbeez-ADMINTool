@@ -15,26 +15,26 @@ export default function ProductFeed({
   screen = "",
   isApproved = false,
 }) {
- 
   const [message, setMessage] = useState("");
   const [show, setShow] = useState(false);
+  const [feed, setFeed] = useState([]);
+
   const [formData, setFormData] = useState({
     author: "",
     description: "",
     file: null,
   });
+
+  const { userDetails, handleUpload, fetchFeeds } = useAuth();
+
   const [descriptionError, setDescriptionError] = useState("");
   const [fileError, setFileError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { userDetails,handleUpload } = useAuth();
- 
+
   useEffect(() => {
-    if ( userDetails && !formData.author) {
+    if (userDetails && !formData.author) {
       const fullName = `${userDetails.result.firstName} ${userDetails.result.lastName}`;
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        author: fullName,
-      }));
+      setFormData((prev) => ({ ...prev, author: fullName }));
     }
   }, [userDetails, formData.author]);
 
@@ -53,71 +53,66 @@ export default function ProductFeed({
     const file = e.target.files[0];
     const fileTypes = ["image/jpeg", "image/png", "image/gif", "video/mp4"];
 
-    if (file) {
-      if (file.size > 50 * 1024 * 1024) {
-        // Allow only up to 50 MB
-        setFileError("File size should not exceed 50 MB.");
-        setFormData({
-          ...formData,
-          file: null,
-        });
-      } else if (!fileTypes.includes(file.type)) {
-        setFileError("Only image and video files are allowed.");
-        setFormData({
-          ...formData,
-          file: null,
-        });
-      } else {
-        setFileError("");
-        setFormData({
-          ...formData,
-          file,
-        });
-      }
-    } else {
+    if (!file) {
       setFileError("File is required.");
-      setFormData({
-        ...formData,
-        file: null,
-      });
+      return;
     }
+
+    if (file.size > 50 * 1024 * 1024) {
+      setFileError("File size should not exceed 50 MB.");
+    } else if (!fileTypes.includes(file.type)) {
+      setFileError("Only image and video files are allowed.");
+    } else {
+      setFileError("");
+    }
+
+    setFormData((prev) => ({ ...prev, file }));
   };
 
   const handleChange = (e) => {
     const value = e.target.value;
-    if (value.length > 200) {
-      setDescriptionError("Description cannot exceed 200 characters.");
-      
+    if (value.length > 1000) {
+      setDescriptionError("Description cannot exceed 1000 characters.");
     } else {
-      // console.log("is work");
       setDescriptionError("");
-      setFormData({
-        ...formData,
-        description: value,
-      });
+      setFormData((prev) => ({ ...prev, description: value }));
     }
   };
 
   const showModal = () => {
     setShow(true);
+
+    const firstName = localStorage.getItem("firstName");
+
+    const lastName = localStorage.getItem("lastName");
+    const fullName = firstName.concat(" ", lastName);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      author: fullName,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!formData.file) {
       setFileError("File is required.");
       return;
     }
 
     if (!descriptionError && !fileError) {
-      setLoading(true); 
+      setLoading(true);
       try {
         await handleUpload(formData, setMessage, setFormData);
         handleClose();
-        
+        const newFeeds = await fetchFeeds(0, 1);
+        setFeed((prevFeeds) => {
+          const updated = [...newFeeds, ...prevFeeds];
+          return updated.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+        });
       } catch (error) {
-        // console.error("Error during upload:", error);
+        console.error("Error during upload:", error);
       }
       setLoading(false);
     }
@@ -126,55 +121,42 @@ export default function ProductFeed({
   return (
     <>
       <Card style={{ marginTop: "0px" }}>
-        {screen === "ALL_DATA" ? (
-          <CardHeader title={title}>
-            <CardHeaderToolbar>
-              <div className="d-flex mt-3 flex-wrap">
-                <div>
-                  <Button onClick={showModal}>Create Post</Button>
-                </div>
-              </div>
-            </CardHeaderToolbar>
-          </CardHeader>
-        ) : (
-          <CardHeader title={title}>
-            <CardHeaderToolbar>
-              <div className="d-flex"></div>
-            </CardHeaderToolbar>
-          </CardHeader>
-        )}
-        <CardBody style={{ justifyContent: "center"}}>
-          <FeedCard/>
+        <CardHeader title={title}>
+          <CardHeaderToolbar>
+            {screen === "ALL_DATA" && (
+              <Button onClick={showModal}>Create Post</Button>
+            )}
+          </CardHeaderToolbar>
+        </CardHeader>
+        <CardBody style={{ justifyContent: "center" }}>
+          <FeedCard feeds={feed} setFeeds={setFeed} />
         </CardBody>
       </Card>
-      {/* -----  Upload  Modal ---- */}
-      <Modal
-        show={show}
-        onHide={handleClose}
-        aria-labelledby="contained-modal-title-vcenter"
-        centered
-        size="lg"
-      >
+
+      <Modal show={show} onHide={handleClose} centered size="lg" scrollable>
         <Modal.Header closeButton>
-          <Modal.Title>Feed Upload</Modal.Title>
+          <Modal.Title className="fw-semibold">Upload New Post</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSubmit}>
-          <Modal.Body>
+          <Modal.Body
+            className="px-4 py-3"
+            style={{ maxHeight: "80vh", overflowY: "auto" }}
+          >
             <div
               style={{
                 display: "inline-block",
-                width: "48%",
+                width: "30%",
                 marginRight: "8px",
               }}
             >
               <Form.Label htmlFor="author">Author</Form.Label>
               <Form.Control
                 type="text"
-                id="author" 
+                id="author"
                 name="author"
                 value={formData.author}
                 onChange={(e) => {
-                  handleChange(e); 
+                  handleChange(e);
                 }}
                 required
               />
@@ -182,7 +164,7 @@ export default function ProductFeed({
             <div
               style={{
                 display: "inline-block",
-                width: "48%",
+                width: "60%",
                 marginRight: "8px",
               }}
             >
@@ -193,54 +175,66 @@ export default function ProductFeed({
                 name="description"
                 value={formData.description}
                 onChange={(e) => {
-                  handleChange(e); // Only update the state if input is valid
+                  handleChange(e);
                 }}
                 placeholder="Enter a description (max 200 characters)"
-                isInvalid={!!descriptionError} // Show invalid styling when there's an error
+                isInvalid={!!descriptionError}
               />
               <Form.Control.Feedback type="invalid">
                 {descriptionError}
               </Form.Control.Feedback>
             </div>
 
-            <div
-              style={{
-                display: "inline-block",
-                width: "48%",
-                marginRight: "8px",
-              }}
-            >
-              <Form.Label htmlFor="file">Image or Video</Form.Label>
-              <div className="border border-gray-100 border-2 p-2 w-60">
-                <input type="file" name="file" id="file" onChange={handleFileChange} />
+            <div className="d-inline-block border rounded px-3 py-2 bg-light mt-5">
+              <Form.Group className="mb-0">
+                <Form.Label className="fw-medium mb-1">
+                  Upload Image or Video
+                </Form.Label>
+                <Form.Control
+                  type="file"
+                  onChange={handleFileChange}
+                  style={{ width: "auto" }}
+                />
                 {fileError && (
-                  <div className="text-danger mt-2">{fileError}</div>
+                  <div className="text-danger small mt-1">{fileError}</div>
                 )}
-              </div>
-              <Form.Label htmlFor="file">Selected File</Form.Label>
-              <div
-                className="border border-gray-100 border-2 p-2 w-60"
-                style={{
-                  height: "100%",
-                  overflow: "auto",
-                  textAlign: "center",
-                }}
-              >
-                {formData.file ? (
-                  formData.file.type.startsWith("image/") ? (
+              </Form.Group>
+            </div>
+
+            {formData.file && (
+              <div className="mt-3 rounded border p-2 bg-light">
+                <p className="mb-2 fw-medium">Preview:</p>
+
+                <div
+                  style={{
+                    width: "100%",
+                    height: "250px",
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#f8f9fa",
+                    overflow: "hidden",
+                  }}
+                >
+                  {formData.file.type.startsWith("image/") ? (
                     <img
                       src={URL.createObjectURL(formData.file)}
-                      alt="Selected"
+                      alt="preview"
                       style={{
-                        width: "100%",
                         maxHeight: "100%",
-                        marginTop: "3px",
+                        maxWidth: "100%",
+                        objectFit: "contain",
                       }}
                     />
-                  ) : formData.file.type.startsWith("video/") ? (
+                  ) : (
                     <video
                       controls
-                      style={{ width: "100%", maxHeight: "100%" }}
+                      style={{
+                        maxHeight: "100%",
+                        maxWidth: "100%",
+                        objectFit: "contain",
+                      }}
                     >
                       <source
                         src={URL.createObjectURL(formData.file)}
@@ -248,33 +242,34 @@ export default function ProductFeed({
                       />
                       Your browser does not support the video tag.
                     </video>
-                  ) : null
-                ) : (
-                  <p>No file selected</p>
-                )}
-              </div>
-            </div>
+                  )}
+                </div>
 
-            <br />
-            <hr />
-            <div style={{ display: "flex", justifyContent: "end" }}>
-              <Button variant="secondary" onClick={handleClose}>
-                Close
-              </Button>
-              <Button
-                style={{
-                  backgroundColor: "#FACD21",
-                  border: "none",
-                  color: "black",
-                  marginLeft: 2,
-                }}
-                type="submit"
-                disabled={loading}
-              >
-               {loading ? "Uploading..." : "Upload"} 
-              </Button>
-            </div>
+                <div className="mt-2 text small">
+                  File Type: <strong>{formData.file.type}</strong> | Size:{" "}
+                  <strong>{(formData.file.size / 1024).toFixed(2)} KB</strong>
+                </div>
+              </div>
+            )}
           </Modal.Body>
+
+          <Modal.Footer className="px-4 pb-3">
+            <Button variant="outline-secondary" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={loading}
+              className="ms-2"
+              style={{
+                backgroundColor: "#FACD21",
+                color: "black",
+                border: "none",
+              }}
+            >
+              {loading ? "Uploading..." : "Upload"}
+            </Button>
+          </Modal.Footer>
         </Form>
       </Modal>
     </>
