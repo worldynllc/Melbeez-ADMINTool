@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
-import { showErrorToast, showSuccessToast } from "../../../../Utility/toastMsg";
+import { showErrorToast } from "../../../../Utility/toastMsg";
 
 const AddEditModal = ({
   show,
@@ -11,7 +11,6 @@ const AddEditModal = ({
   setFormData,
 }) => {
   const [validated, setValidated] = useState(false);
-  const [fileError, setFileError] = useState("");
 
   useEffect(() => {
     if (formData === undefined) {
@@ -39,11 +38,10 @@ const AddEditModal = ({
       e.stopPropagation();
     } else {
       try {
-        await handleSubmit(e); // Call handleSubmit function passed from parent
+        await handleSubmit(e);
 
-        onHide(); // Close modal
+        onHide();
       } catch (error) {
-        // console.error("Error handling warranty:", error);
         showErrorToast("Error handling warranty.");
       }
     }
@@ -74,22 +72,6 @@ const AddEditModal = ({
       </Modal.Header>
       <Form noValidate validated={validated} onSubmit={handleSubmitForm}>
         <Modal.Body>
-          {/* <div style={{ display: 'inline-block', width: '48%', marginRight: '8px' }}>
-            <Form.Group controlId="warrantyId">
-              <Form.Label>* Warranty ID</Form.Label>
-              <Form.Control
-                type="text"
-                name="warrantyId"
-                value={formData.warrantyId}
-                onChange={handleInputChange}
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please provide a warranty ID.
-              </Form.Control.Feedback>
-            </Form.Group>
-          </div> */}
-
           <div className="d-flex flex-wrap">
             <div className="p-2 flex-fill" style={{ width: "48%" }}>
               <Form.Label>* Vendor Name</Form.Label>
@@ -205,7 +187,6 @@ const AddEditModal = ({
                 required
                 value={formData.planDescription || ""}
                 onChange={handleInputChange}
-                // pattern="[a-zA-Z\s]*"
               />
               <Form.Control.Feedback type="invalid">
                 Please provide plan description.

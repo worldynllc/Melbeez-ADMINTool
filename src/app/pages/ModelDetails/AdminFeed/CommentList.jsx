@@ -18,7 +18,7 @@ const CommentList = ({ comments, onDeleteClick, calculatePostAge }) => (
             <span style={{ fontSize: "10px", marginLeft: "15px" }}>
               {calculatePostAge(comment.createdAt)}
             </span>
-            <a href="#" onClick={() => onDeleteClick(comment, "comment")}>
+            <a href="# " onClick={() => onDeleteClick(comment, "comment")}>
               <span className="svg-icon svg-icon-md svg-icon-secondary">
                 <SVG src={toAbsoluteUrl("/media/svg/icons/General/Trash.svg")} />
               </span>
