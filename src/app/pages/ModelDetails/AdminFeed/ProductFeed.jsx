@@ -15,7 +15,7 @@ export default function ProductFeed({
   screen = "",
   isApproved = false,
 }) {
-  const [message, setMessage] = useState("");
+  const [setMessage] = useState("");
   const [show, setShow] = useState(false);
   const [feed, setFeed] = useState([]);
 
@@ -107,9 +107,7 @@ export default function ProductFeed({
         const newFeeds = await fetchFeeds(0, 1);
         setFeed((prevFeeds) => {
           const updated = [...newFeeds, ...prevFeeds];
-          return updated.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
+          return updated;
         });
       } catch (error) {
         console.error("Error during upload:", error);
@@ -201,66 +199,36 @@ export default function ProductFeed({
               </Form.Group>
             </div>
 
-            {formData.file && (
-              <div className="mt-3 rounded border p-2 bg-light">
-                <p className="mb-2 fw-medium">Preview:</p>
+           {formData.file && formData.file.type.startsWith("image/") && (
+  <div className="mt-3 rounded border p-2 bg-light">
+    <p className="mb-2 fw-medium">Image Preview:</p>
+    <img
+      src={URL.createObjectURL(formData.file)}
+      alt="preview"
+      style={{
+        maxWidth: "200px",
+        maxHeight: "200px",
+        borderRadius: "6px",
+        objectFit: "cover",
+        border: "1px solid #dee2e6",
+      }}
+    />
+    <div className="mt-2 text-muted small">
+      File Type: <strong>{formData.file.type}</strong> | Size:{" "}
+      <strong>{(formData.file.size / 1024).toFixed(2)} KB</strong>
+    </div>
+  </div>
+)}
 
-                <div
-                  style={{
-                    width: "100%",
-                    height: "250px",
-                    borderRadius: "8px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backgroundColor: "#f8f9fa",
-                    overflow: "hidden",
-                  }}
-                >
-                  {formData.file.type.startsWith("image/") ? (
-                    <img
-                      src={URL.createObjectURL(formData.file)}
-                      alt="preview"
-                      style={{
-                        maxHeight: "100%",
-                        maxWidth: "100%",
-                        objectFit: "contain",
-                      }}
-                    />
-                  ) : (
-                    <video
-                      controls
-                      style={{
-                        maxHeight: "100%",
-                        maxWidth: "100%",
-                        objectFit: "contain",
-                      }}
-                    >
-                      <source
-                        src={URL.createObjectURL(formData.file)}
-                        type={formData.file.type}
-                      />
-                      Your browser does not support the video tag.
-                    </video>
-                  )}
-                </div>
-
-                <div className="mt-2 text small">
-                  File Type: <strong>{formData.file.type}</strong> | Size:{" "}
-                  <strong>{(formData.file.size / 1024).toFixed(2)} KB</strong>
-                </div>
-              </div>
-            )}
-          </Modal.Body>
-
-          <Modal.Footer className="px-4 pb-3">
+         
+<div className="m-2">
             <Button variant="outline-secondary" onClick={handleClose}>
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={loading}
-              className="ms-2"
+              className="ms-2 mx-2 my-2"
               style={{
                 backgroundColor: "#FACD21",
                 color: "black",
@@ -269,7 +237,9 @@ export default function ProductFeed({
             >
               {loading ? "Uploading..." : "Upload"}
             </Button>
-          </Modal.Footer>
+            </div>
+             </Modal.Body>
+        
         </Form>
       </Modal>
     </>

@@ -148,14 +148,15 @@ function FeedCard({ feeds, setFeeds }) {
       (like) => like.feed?.id === postId && like.userId === userId
     );
   };
-  const handleLikeFromCard = async (postId) => {
-    try {
-      await createLikes(postId);
-      await fetchLikesdetails();
-    } catch (error) {
-      console.error("Error toggling like:", error);
-    }
-  };
+  
+  // const handleLikeFromCard = async (postId) => {
+  //   try {
+  //     await createLikes(postId);
+  //     await fetchLikesdetails();
+  //   } catch (error) {
+  //     console.error("Error toggling like:", error);
+  //   }
+  // };
 
   return (
     <div>
@@ -188,7 +189,7 @@ function FeedCard({ feeds, setFeeds }) {
             <FeedPost
               post={post}
               fetchComments={fetchComments}
-              createLikes={handleLikeFromCard}
+              // createLikes={handleLikeFromCard}
               isLiked={isPostLikedByUser(post.id)}
               postcomments={post.comments}
               onplay={handleVideoPlay}
