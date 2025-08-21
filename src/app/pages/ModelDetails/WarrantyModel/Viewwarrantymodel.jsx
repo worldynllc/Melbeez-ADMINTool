@@ -67,12 +67,12 @@ const ViewUpload = ({ show, onHide, formData, handleBlur, setFormData }) => {
                 <Form.Control type="text" disabled value={formData.discount || ""} />
               </Form.Group>
             </div>
-            <div className="p-2 flex-fill" style={{ maxWidth: "48%" }}>
+            {/* <div className="p-2 flex-fill" style={{ maxWidth: "48%" }}>
               <Form.Group>
                 <Form.Label>Price id</Form.Label>
                 <Form.Control type="text" disabled value={formData.product_price_ids || ""} />
               </Form.Group>
-            </div>
+            </div> */}
 
             <div className="p-2 flex-fill" style={{ maxWidth: "48%" }}>
               <Form.Group>

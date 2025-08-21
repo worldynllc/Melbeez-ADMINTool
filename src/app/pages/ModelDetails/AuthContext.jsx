@@ -226,7 +226,6 @@ const createLikes = async (feedId) => {
       !formData.annualPrice ||
       !formData.planDescription ||
       !formData.other_Details ||
-      !formData.product_price_ids ||
       !formData.planName
     ) {
       setMessage("Please fill in all required fields.");
@@ -253,7 +252,6 @@ const createLikes = async (feedId) => {
     form.append("updated_by", "");
     form.append("planDescription", formData.planDescription);
     form.append("planName", formData.planName);
-    form.append("product_price_ids", formData.product_price_ids);
     form.append("other_Details", formData.other_Details);
     form.append("userId", userId);
     if (formData.file) {
@@ -289,7 +287,6 @@ const createLikes = async (feedId) => {
         planDescription: "",
         planName: "",
         other_Details: "",
-        product_price_ids: "",
         file: null,
       });
       setShowAddModal(false);

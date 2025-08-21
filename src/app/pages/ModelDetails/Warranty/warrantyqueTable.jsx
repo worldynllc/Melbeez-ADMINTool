@@ -158,7 +158,6 @@ const WarrantyProductQueueTable = ({
     monthlyPrice: "",
     annualPrice: "",
     other_Details: "",
-    product_price_ids: "",
     discount: "",
     status: "",
     planDescription: "", // Clear planDescription field

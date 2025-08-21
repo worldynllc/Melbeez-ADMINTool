@@ -33,7 +33,6 @@ const AddUpload = ({
     planName: "",
     file: null,
     other_Details: "",
-    product_price_ids: "",
   };
 
   const handleSubmitForm = async (e) => {
@@ -229,7 +228,7 @@ const AddUpload = ({
             />
           </div>
 
-          <div
+          {/* <div
             style={{
               display: "inline-block",
               width: "48%",
@@ -248,7 +247,7 @@ const AddUpload = ({
               onChange={handleInputChange}
               required
             />
-          </div>
+          </div> */}
 
           <div
             style={{
