@@ -49,6 +49,9 @@ export const AuthProvider = ({ children }) => {
     };
     fetchUserDetails();
   }, []);
+
+
+
   const fetchFeeds = async (page = 0, size = 3) => {
     try {
       const response = await fetch(
@@ -66,13 +69,58 @@ export const AuthProvider = ({ children }) => {
       }
       const data = await response.json();
 
-      data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
 
       return data;
     } catch (error) {
       return [];
     }
   };
+
+
+const createLikes = async (feedId) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_JAVA_API_URL}/like/${feedId}/${userId}/${userName}`,
+        {
+          method: "POST",
+          headers: {
+            ...getAuthorizedHeaders(),
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to add Like");
+      }
+    } catch (error) {
+      console.error("Error adding like:", error);
+    }
+  };
+  
+  const fetchLikesdetails = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_JAVA_API_URL}/like/all`,
+        {
+          method: "GET",
+          mode: "cors",
+          headers: {
+            ...getAuthorizedHeaders(),
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch feeds");
+      }
+      const data = await response.json();
+      setLikeDetails(data);
+    } catch (error) {
+      console.log("no likes found");
+    }
+  };
+
 
   const handleUpload = async (
     formData,
@@ -178,7 +226,6 @@ export const AuthProvider = ({ children }) => {
       !formData.annualPrice ||
       !formData.planDescription ||
       !formData.other_Details ||
-      !formData.product_price_ids ||
       !formData.planName
     ) {
       setMessage("Please fill in all required fields.");
@@ -205,7 +252,6 @@ export const AuthProvider = ({ children }) => {
     form.append("updated_by", "");
     form.append("planDescription", formData.planDescription);
     form.append("planName", formData.planName);
-    form.append("product_price_ids", formData.product_price_ids);
     form.append("other_Details", formData.other_Details);
     form.append("userId", userId);
     if (formData.file) {
@@ -241,7 +287,6 @@ export const AuthProvider = ({ children }) => {
         planDescription: "",
         planName: "",
         other_Details: "",
-        product_price_ids: "",
         file: null,
       });
       setShowAddModal(false);
@@ -369,47 +414,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const createLikes = async (feedId) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_JAVA_API_URL}/like/${feedId}/${userId}/${userName}`,
-        {
-          method: "POST",
-          headers: {
-            ...getAuthorizedHeaders(),
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to add Like");
-      }
-    } catch (error) {
-      console.error("Error adding like:", error);
-    }
-  };
-  const fetchLikesdetails = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_JAVA_API_URL}/like/all`,
-        {
-          method: "GET",
-          mode: "cors",
-          headers: {
-            ...getAuthorizedHeaders(),
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch feeds");
-      }
-      const data = await response.json();
-      setLikeDetails(data);
-    } catch (error) {
-      console.log("no likes found");
-    }
-  };
+  
 
   const fetchTransactionDetails = async () => {
     try {

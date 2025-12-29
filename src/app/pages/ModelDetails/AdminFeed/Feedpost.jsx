@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import { toAbsoluteUrl } from "../../../../_metronic/_helpers";
 import SVG from "react-inlinesvg";
+import { useAuth } from "../AuthContext";
 
 const FeedPost = ({
   post,
-  createLikes,
+
   onPlay,
   isLiked,
   playingVideoId,
@@ -24,6 +25,8 @@ const FeedPost = ({
     setLikedByUser(isLiked);
     setLikeCount(post.likesCount);
   }, [isLiked, post.likesCount]);
+
+  const {createLikes} = useAuth();
 
   const handleLikeClick = async () => {
     const updatedLikeState = !likedByUser;

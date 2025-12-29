@@ -159,7 +159,7 @@ const AddEditModal = ({
               </Form.Control.Feedback>
             </div>
 
-            <div className="p-2 flex-fill" style={{ width: "48%" }}>
+            {/* <div className="p-2 flex-fill" style={{ width: "48%" }}>
               <Form.Label>* Price Id</Form.Label>
               <Form.Control
                 type="text"
@@ -174,7 +174,7 @@ const AddEditModal = ({
               <Form.Control.Feedback type="invalid">
                 Please provide a product name.
               </Form.Control.Feedback>
-            </div>
+            </div> */}
 
             <div className="p-2 flex-fill" style={{ width: "48%" }}>
               <Form.Label>planDescription</Form.Label>
