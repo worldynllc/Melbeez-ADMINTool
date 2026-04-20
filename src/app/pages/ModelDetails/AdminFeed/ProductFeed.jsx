@@ -80,16 +80,22 @@ export default function ProductFeed({
   };
 
   const showModal = () => {
-    setShow(true);
+    let fullName = "";
 
-    const firstName = localStorage.getItem("firstName");
+    if (userDetails) {
+      fullName = `${userDetails.result.firstName} ${userDetails.result.lastName}`;
+    } else {
+      const firstName = localStorage.getItem("firstName") || "";
+      const lastName = localStorage.getItem("lastName") || "";
+      fullName = `${firstName} ${lastName}`;
+    }
 
-    const lastName = localStorage.getItem("lastName");
-    const fullName = firstName.concat(" ", lastName);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
+    setFormData((prev) => ({
+      ...prev,
       author: fullName,
     }));
+
+    setShow(true);
   };
 
   const handleSubmit = async (e) => {
@@ -153,10 +159,7 @@ export default function ProductFeed({
                 id="author"
                 name="author"
                 value={formData.author}
-                onChange={(e) => {
-                  handleChange(e);
-                }}
-                required
+                disabled
               />
             </div>
             <div
@@ -199,47 +202,47 @@ export default function ProductFeed({
               </Form.Group>
             </div>
 
-           {formData.file && formData.file.type.startsWith("image/") && (
-  <div className="mt-3 rounded border p-2 bg-light">
-    <p className="mb-2 fw-medium">Image Preview:</p>
-    <img
-      src={URL.createObjectURL(formData.file)}
-      alt="preview"
-      style={{
-        maxWidth: "200px",
-        maxHeight: "200px",
-        borderRadius: "6px",
-        objectFit: "cover",
-        border: "1px solid #dee2e6",
-      }}
-    />
-    <div className="mt-2 text-muted small">
-      File Type: <strong>{formData.file.type}</strong> | Size:{" "}
-      <strong>{(formData.file.size / 1024).toFixed(2)} KB</strong>
-    </div>
-  </div>
-)}
+            {formData.file && formData.file.type.startsWith("image/") && (
+              <div className="mt-3 rounded border p-2 bg-light">
+                <p className="mb-2 fw-medium">Image Preview:</p>
+                <img
+                  src={URL.createObjectURL(formData.file)}
+                  alt="preview"
+                  style={{
+                    maxWidth: "200px",
+                    maxHeight: "200px",
+                    borderRadius: "6px",
+                    objectFit: "cover",
+                    border: "1px solid #dee2e6",
+                  }}
+                />
+                <div className="mt-2 text-muted small">
+                  File Type: <strong>{formData.file.type}</strong> | Size:{" "}
+                  <strong>{(formData.file.size / 1024).toFixed(2)} KB</strong>
+                </div>
+              </div>
+            )}
 
-         
-<div className="m-2">
-            <Button variant="outline-secondary" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="ms-2 mx-2 my-2"
-              style={{
-                backgroundColor: "#FACD21",
-                color: "black",
-                border: "none",
-              }}
-            >
-              {loading ? "Uploading..." : "Upload"}
-            </Button>
+
+            <div className="m-2">
+              <Button variant="outline-secondary" onClick={handleClose}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="ms-2 mx-2 my-2"
+                style={{
+                  backgroundColor: "#FACD21",
+                  color: "black",
+                  border: "none",
+                }}
+              >
+                {loading ? "Uploading..." : "Upload"}
+              </Button>
             </div>
-             </Modal.Body>
-        
+          </Modal.Body>
+
         </Form>
       </Modal>
     </>
